@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Novaes Planejados — Solicitar Orçamento</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -48,6 +48,7 @@
     font-size: 1.25rem; font-weight: 500; letter-spacing: 0.12em;
     color: var(--green-dark); text-transform: uppercase;
   }
+  
   .nav-tabs {
     display: flex; gap: 2rem;
     list-style: none;
@@ -82,6 +83,14 @@
     position: relative;
     overflow: hidden;
   }
+  .hero::before {
+    content: '';
+    position: absolute; top: -20%; right: -5%;
+    width: 500px; height: 600px;
+    background: radial-gradient(ellipse, rgba(168,197,160,0.25) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
   .hero-left { position: relative; z-index: 1; }
   .hero-tag {
     display: inline-flex; align-items: center; gap: 8px;
@@ -90,6 +99,11 @@
     font-size: 0.75rem; font-weight: 500; color: var(--green-dark);
     letter-spacing: 0.06em; text-transform: uppercase;
     margin-bottom: 1.5rem;
+  }
+  .hero-tag::before {
+    content: ''; width: 6px; height: 6px;
+    background: var(--green); border-radius: 50%;
+    display: inline-block;
   }
   .hero h1 {
     font-family: 'Cormorant Garamond', serif;
@@ -141,6 +155,7 @@
     box-shadow: 0 8px 32px rgba(0,0,0,0.12);
     white-space: nowrap; z-index: 2;
   }
+  .hero-badge-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; }
   .hero-badge span { font-size: 0.8rem; font-weight: 500; color: var(--text); }
 
   /* STATS */
@@ -155,8 +170,23 @@
   }
   .stat-label { font-size: 0.75rem; color: rgba(255,255,255,0.65); letter-spacing: 0.06em; text-transform: uppercase; }
 
-  /* PORTFOLIO GRID FIX */
+  /* PORTFOLIO SECTION (HOME) */
   .section { padding: 5rem 5%; }
+  .section-tag {
+    display: inline-block; background: var(--green-bg);
+    color: var(--green-dark); font-size: 0.72rem; font-weight: 500;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 5px 14px; border-radius: 50px; margin-bottom: 1rem;
+    border: 1px solid var(--green-muted);
+  }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 4vw, 3rem); font-weight: 300;
+    line-height: 1.2; margin-bottom: 0.75rem;
+  }
+  .section-title em { color: var(--green-dark); font-style: italic; }
+  .section-sub { color: var(--text-muted); font-size: 0.95rem; line-height: 1.7; max-width: 480px; margin-bottom: 2.5rem; }
+
   .portfolio-grid {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr;
@@ -170,9 +200,7 @@
   }
   .portfolio-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s; }
   .portfolio-item:hover img { transform: scale(1.04); }
-
-  #page-home .portfolio-grid .portfolio-item:first-child { grid-row: 1 / 3; border-radius: 24px; }
-
+  .portfolio-item:first-child { grid-row: 1 / 3; border-radius: 24px; }
   .portfolio-overlay {
     position: absolute; bottom: 0; left: 0; right: 0;
     background: linear-gradient(transparent, rgba(30,50,32,0.75));
@@ -194,11 +222,19 @@
     text-align: center;
     position: relative; overflow: hidden;
   }
+  .sobre-hero::before {
+    content: '';
+    position: absolute; top: -50%; left: -20%;
+    width: 600px; height: 600px;
+    background: radial-gradient(ellipse, rgba(255,255,255,0.06) 0%, transparent 60%);
+    border-radius: 50%;
+  }
   .sobre-hero h2 {
     font-family: 'Cormorant Garamond', serif;
     font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 300;
     color: white; line-height: 1.15; margin-bottom: 1rem;
   }
+  .sobre-hero h2 em { font-style: italic; color: var(--green-light); }
   .sobre-hero p { color: rgba(255,255,255,0.75); font-size: 1rem; line-height: 1.75; max-width: 560px; margin: 0 auto; }
 
   .sobre-content { padding: 4rem 5%; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
@@ -227,11 +263,16 @@
     background: var(--green-bg); border: 1px solid var(--green-muted);
     border-radius: var(--radius-sm); padding: 1rem;
   }
+  .valor-card .icon { font-size: 1.2rem; margin-bottom: 0.4rem; }
   .valor-card h4 { font-size: 0.85rem; font-weight: 500; color: var(--green-dark); margin-bottom: 0.2rem; }
   .valor-card p { font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; }
 
   /* FOUNDERS */
   .founders { padding: 3rem 5% 5rem; }
+  .founders h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.8rem; font-weight: 300; text-align: center; margin-bottom: 2.5rem;
+  }
   .founders-grid { display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; }
   .founder-card {
     background: white; border-radius: var(--radius); padding: 2rem;
@@ -288,8 +329,13 @@
     font-size: 0.72rem; color: rgba(255,255,255,0.5);
     flex-shrink: 0; transition: all 0.3s;
   }
-  .step-item.done .step-num { background: var(--green); border-color: var(--green); color: white; }
-  .step-item.active .step-num { background: white; border-color: white; color: var(--green-dark); font-weight: 600; }
+  .step-item.done .step-num {
+    background: var(--green); border-color: var(--green); color: white;
+  }
+  .step-item.active .step-num {
+    background: white; border-color: white; color: var(--green-dark);
+    font-weight: 600;
+  }
   .step-info { flex: 1; }
   .step-label { font-size: 0.82rem; color: rgba(255,255,255,0.5); font-weight: 400; transition: color 0.3s; }
   .step-item.active .step-label { color: white; font-weight: 500; }
@@ -339,10 +385,19 @@
     width: 100%;
   }
 
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
   
-  .msg.ai { justify-content: flex-start; }
-  .msg.user { flex-direction: row-reverse; justify-content: flex-start; }
+  .msg.ai {
+    justify-content: flex-start;
+  }
+
+  .msg.user { 
+    flex-direction: row-reverse; 
+    justify-content: flex-start;
+  }
 
   .msg-avatar {
     width: 32px; height: 32px; border-radius: 50%;
@@ -352,24 +407,53 @@
     font-family: 'Cormorant Garamond', serif; font-size: 0.95rem; color: var(--green-dark);
   }
   
-  .msg-bubble { max-width: 75%; padding: 12px 16px; border-radius: 18px; font-size: 0.88rem; line-height: 1.65; width: fit-content; }
-  .msg.ai .msg-bubble { background: white; color: var(--text); border: 1px solid rgba(122,158,126,0.15); border-bottom-left-radius: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-  .msg.user .msg-bubble { background: var(--green-dark); color: white; border-bottom-right-radius: 4px; }
+  .msg-bubble {
+    max-width: 75%; padding: 12px 16px;
+    border-radius: 18px; font-size: 0.88rem; line-height: 1.65;
+    width: fit-content;
+  }
+  
+  .msg.ai .msg-bubble {
+    background: white; color: var(--text);
+    border: 1px solid rgba(122,158,126,0.15);
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+  
+  .msg.user .msg-bubble {
+    background: var(--green-dark); color: white;
+    border-bottom-right-radius: 4px;
+  }
   
   .typing { display: flex; gap: 5px; align-items: center; padding: 14px 16px; }
   .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green-muted); animation: bounce 1.2s infinite; }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
   @keyframes bounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
 
   /* INPUT AREA */
-  .chat-input-area { padding: 1rem 2rem 1.25rem; background: white; border-top: 1px solid rgba(122,158,126,0.15); }
-  .options-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
-  .opt-btn { background: var(--green-bg); border: 1.5px solid var(--green-muted); color: var(--green-dark); border-radius: 50px; padding: 8px 16px; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 400; cursor: pointer; transition: all 0.18s; }
+  .chat-input-area {
+    padding: 1rem 2rem 1.25rem;
+    background: white;
+    border-top: 1px solid rgba(122,158,126,0.15);
+  }
+  .options-grid {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  .opt-btn {
+    background: var(--green-bg); border: 1.5px solid var(--green-muted);
+    color: var(--green-dark); border-radius: 50px; padding: 8px 16px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 400;
+    cursor: pointer; transition: all 0.18s;
+  }
   .opt-btn:hover { background: var(--green); color: white; border-color: var(--green); }
   .opt-btn.selected { background: var(--green-dark); color: white; border-color: var(--green-dark); }
-  .input-row { display: flex; gap: 10px; align-items: flex-end; }
-  
-  /* CLASSE GLOBAL DO INPUT (EVITA ZOOM NO IPHONE) */
-  .chat-input { 
+
+  .input-row {
+    display: flex; gap: 10px; align-items: flex-end;
+  }
+.chat-input { 
     flex: 1; 
     border: 1.5px solid rgba(122,158,126,0.3); 
     border-radius: 12px; 
@@ -384,27 +468,54 @@
     min-height: 44px; 
     max-height: 100px; 
   }
-  
+  }
   .chat-input:focus { border-color: var(--green); }
-  .send-btn-chat { width: 44px; height: 44px; border-radius: 12px; background: var(--green-dark); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; flex-shrink: 0; }
+  .chat-input::placeholder { color: var(--text-muted); }
+  .send-btn-chat {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: var(--green-dark); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
   .send-btn-chat:hover { background: var(--green); }
   .send-btn-chat svg { width: 18px; height: 18px; fill: white; }
 
   /* SUMMARY PAGE */
   .summary-page { padding: 3rem 5%; max-width: 900px; margin: 0 auto; }
   .summary-header { text-align: center; margin-bottom: 3rem; }
-  .summary-header h2 { font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; font-weight: 300; margin-bottom: 0.5rem; }
-  .summary-card { background: white; border-radius: var(--radius); border: 1px solid rgba(122,158,126,0.2); padding: 2rem; margin-bottom: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+  .summary-header h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.5rem; font-weight: 300; margin-bottom: 0.5rem;
+  }
+  .summary-card {
+    background: white; border-radius: var(--radius);
+    border: 1px solid rgba(122,158,126,0.2); padding: 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  }
   .summary-card h3 { font-size: 0.72rem; font-weight: 500; color: var(--green-dark); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1.25rem; }
   .summary-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--cream-dark); font-size: 0.88rem; }
   .summary-row:last-child { border-bottom: none; }
   .summary-row span:first-child { color: var(--text-muted); }
-  .summary-row span:last-child { font-weight: 500; text-align: right; max-width: 60%; }
-  .whats-btn { display: flex; align-items: center; justify-content: center; gap: 10px; background: #25D366; color: white; border: none; border-radius: 50px; padding: 14px 32px; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 500; cursor: pointer; width: 100%; transition: all 0.2s; margin-top: 1.5rem; }
+  .summary-row span:last-child { font-weight: 500; }
+  .whats-btn {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    background: #25D366; color: white; border: none;
+    border-radius: 50px; padding: 14px 32px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 500;
+    cursor: pointer; width: 100%; transition: all 0.2s;
+    margin-top: 1.5rem;
+  }
   .whats-btn:hover { background: #1fba59; transform: translateY(-1px); }
+  .whats-btn svg { width: 22px; height: 22px; fill: white; }
 
   /* FOOTER */
-  footer { background: var(--text); color: rgba(255,255,255,0.6); padding: 2rem 5%; text-align: center; font-size: 0.78rem; line-height: 1.7; }
+  footer {
+    background: var(--text); color: rgba(255,255,255,0.6);
+    padding: 2rem 5%; text-align: center;
+    font-size: 0.78rem; line-height: 1.7;
+  }
   footer strong { color: var(--green-light); }
 
   /* ====== MEDIA QUERIES (RESPONSIVIDADE EXTRA) ====== */
@@ -434,6 +545,7 @@
   }
 
   @media(max-width: 480px) {
+    .nav-logo-img { height: 26px; }
     .nav-cta { padding: 8px 14px; font-size: 0.78rem; }
     
     .hero { padding: 2rem 5% 3rem; }
@@ -449,7 +561,6 @@
     .chat-header { padding: 1rem 1.5rem; }
     .chat-messages { padding: 1.5rem 1.5rem; }
     .chat-input-area { padding: 1rem 1.5rem 1.25rem; }
-    
     .msg-bubble { max-width: 90%; font-size: 0.85rem; }
   }
 
@@ -503,7 +614,7 @@
     <div class="stat"><span class="stat-num">+50</span><span class="stat-label">Projetos entregues</span></div>
     <div class="stat"><span class="stat-num">30</span><span class="stat-label">Dias para entrega</span></div>
     <div class="stat"><span class="stat-num">100%</span><span class="stat-label">Personalizado</span></div>
-    <div class="stat"><span class="stat-num">12x</span><span class="stat-label">Sem juros</span></div>
+    <div class="stat"><span class="stat-num">12x</span><span class="stat-label">No cartão</span></div>
   </div>
 
   <section class="section">
@@ -539,7 +650,7 @@
 
   <footer>
     <strong>Novaes Planejados</strong> · Campo Grande, Rio de Janeiro · Fundadores: Marcela e Carlos Daniel<br>
-    @novaesplanejadoss · (21) 99999-9999
+    @novaesplanejadoss · (21) 99999-9999 / (21) 99999-9999
   </footer>
 </div>
 
@@ -579,14 +690,6 @@
       <div class="portfolio-item" data-cat="cozinha" style="height:220px; border-radius:var(--radius);">
         <img src="image_6ed119.jpg" alt="Cozinha Executada" />
         <div class="portfolio-overlay"><span class="portfolio-label">Execução perfeita do 3D para a realidade</span></div>
-      </div>
-      <div class="portfolio-item" data-cat="sala de estar" style="height:220px; border-radius:var(--radius);">
-        <img src="https://images.unsplash.com/photo-1565538810643-b5bdb714032a?w=600&q=80" alt="Quarto" />
-        <div class="portfolio-overlay"><span class="portfolio-label">Quarto Casal</span></div>
-      </div>
-      <div class="portfolio-item" data-cat="sala de estar" style="height:220px; border-radius:var(--radius);">
-        <img src="https://images.unsplash.com/photo-1583845112203-29329902332e?w=600&q=80" alt="Sala Integrada" />
-        <div class="portfolio-overlay"><span class="portfolio-label">Sala Integrada Minimalista</span></div>
       </div>
     </div>
 
@@ -743,6 +846,9 @@
 
       <div class="chat-input-area" id="input-area">
         <div class="options-grid" id="options-grid"></div>
+        <div class="upload-area" id="upload-area">
+
+        </div>
         <div class="input-row">
           <textarea class="chat-input" id="chat-input" placeholder="Digite aqui..." rows="1"></textarea>
           <button class="send-btn-chat" onclick="sendUserMsg()">
@@ -795,7 +901,7 @@
       Enviar para a equipe Novaes via WhatsApp
     </button>
     <div style="text-align:center;margin-top:1rem;">
-      <button class="btn-secondary" onclick="startEditMode()">Voltar e editar informações</button>
+      <button class="btn-secondary" onclick="document.getElementById('summary-overlay').classList.add('hidden')">Voltar e editar</button>
     </div>
   </div>
 </div>
@@ -824,10 +930,13 @@ function filterPortfolio(cat, btn) {
 // ---- CHAT ENGINE ----
 let chatStarted = false;
 let stepIdx = 0;
+// Atualizei os dados do usuário com as novas chaves
 let userData = { nome:'', tel:'', end:'', tipo:'', visita:'', ambiente:'', cor:'', estilo:'', geladeira:'', fogao:'', outros:'', microondas:'', coifa:'', maquina:'' };
 let awaitingInput = null;
 
+// Máquina de estados robusta e condicional
 const flow = [
+  // 0. Identificação (Input Nome)
   {
     messages: [
       { delay: 400, text: "Olá! 🌿 Sou a Nina, assistente da <strong>Novaes Planejados</strong>. Estou aqui para te ajudar a solicitar seu orçamento de móveis planejados." },
@@ -837,6 +946,7 @@ const flow = [
     inputPlaceholder: "Digite seu nome...",
     onInput: (val) => { userData.nome = val; }
   },
+  // 1. Identificação (Input Tel)
   {
     messages: [
       { delay: 400, text: (u) => `Prazer, <strong>${u.nome}</strong>! 😊 Agora me passa o seu <strong>número de WhatsApp</strong> com DDD.` }
@@ -845,6 +955,7 @@ const flow = [
     inputPlaceholder: "(21) 99999-9999",
     onInput: (val) => { userData.tel = val; }
   },
+  // 2. Localização (Input Endereço)
   {
     messages: [
       { delay: 400, text: "Perfeito! Agora preciso do seu <strong>endereço completo</strong> — rua, número, bairro e cidade — para verificar se conseguimos atender sua região." }
@@ -853,6 +964,7 @@ const flow = [
     inputPlaceholder: "Ex: Rua das Flores, 123 — Campo Grande, RJ",
     onInput: (val) => { userData.end = val; }
   },
+  // 3. Localização (Opção Imóvel)
   {
     messages: [
       { delay: 400, text: "Anotado! E esse endereço é de <strong>apartamento ou casa</strong>?" }
@@ -860,6 +972,7 @@ const flow = [
     options: ["🏠 Casa", "🏢 Apartamento"],
     onOption: (val) => { userData.tipo = val; }
   },
+  // 4. Ambiente (Opção Multi)
   {
     messages: [
       { delay: 400, text: "Certo! Me conta: qual <strong>ambiente</strong> você quer planejar? (pode escolher mais de um)" }
@@ -868,6 +981,7 @@ const flow = [
     multiSelect: true,
     onOption: (val) => { userData.ambiente = val; }
   },
+  // 5. Estilo (Opção)
   {
     messages: [
       { delay: 400, text: "Que bacana! E qual <strong>estilo</strong> mais combina com você para esse projeto?" }
@@ -882,6 +996,7 @@ const flow = [
       }
     }
   },
+  // 6. Cor (Opção)
   {
     messages: [
       { delay: 800, text: "Você tem alguma <strong>cor em mente</strong> para os móveis?" }
@@ -889,6 +1004,7 @@ const flow = [
     options: ["⬜ Branco", "🩶 Cinza / Grafite", "🤎 Madeira / Natural", "🖤 Preto", "💚 Verde / Sage", "🎨 Ainda não sei"],
     onOption: (val) => { userData.cor = val; }
   },
+  // 7. Medidas (Input Geladeira)
   {
     messages: [
       { delay: 400, text: "Quase lá! 🎉 Para deixarmos tudo sob medida, preciso saber quais eletrodomésticos você tem ou planeja ter. Qual é o modelo da sua <strong>geladeira</strong>? (ex: Brastemp 400L duplex)" }
@@ -897,6 +1013,7 @@ const flow = [
     inputPlaceholder: "Marca e modelo da geladeira...",
     onInput: (val) => { userData.geladeira = val; }
   },
+  // 8. Medidas (Input Fogão)
   {
     messages: [
       { delay: 400, text: "E o <strong>fogão ou cooktop</strong>? (ex: Electrolux 5 bocas, embutir)" }
@@ -905,6 +1022,7 @@ const flow = [
     inputPlaceholder: "Modelo do fogão/cooktop...",
     onInput: (val) => { userData.fogao = val; }
   },
+  // 9. Medidas (Opção Multi Outros)
   {
     messages: [
       { delay: 400, text: "Tem <strong>microondas, coifa ou máquina de lavar</strong> para incluir no projeto?" }
@@ -913,6 +1031,7 @@ const flow = [
     multiSelect: true,
     onOption: (val) => { userData.outros = val; }
   },
+  // 10. Condicional - Microondas
   {
     condition: () => userData.outros.includes("microondas"),
     messages: [
@@ -922,6 +1041,7 @@ const flow = [
     inputPlaceholder: "Modelo do microondas...",
     onInput: (val) => { userData.microondas = val; }
   },
+  // 11. Condicional - Coifa
   {
     condition: () => userData.outros.includes("coifa"),
     messages: [
@@ -931,6 +1051,7 @@ const flow = [
     inputPlaceholder: "Modelo da coifa...",
     onInput: (val) => { userData.coifa = val; }
   },
+  // 12. Condicional - Máquina de Lavar
   {
     condition: () => userData.outros.includes("máquina de lavar"),
     messages: [
@@ -940,6 +1061,7 @@ const flow = [
     inputPlaceholder: "Modelo da máquina...",
     onInput: (val) => { userData.maquina = val; }
   },
+  // 13. Visita Técnica (Opção)
   {
     messages: [
       { delay: 600, text: "Ótimo! 📍 Nossos especialistas adoram fazer uma <strong>visita técnica</strong> para tomar as medidas com precisão e te mostrar nosso catálogo de cores pessoalmente. Você gostaria de agendar?" }
@@ -958,6 +1080,7 @@ const flow = [
       }
     }
   },
+  // 14. Final (Apresenta o resumo)
   {
     messages: [
       { delay: 2000, text: "🌟 Incrível! Já temos tudo que precisamos." },
@@ -979,6 +1102,7 @@ function runStep(idx) {
   const step = flow[idx];
   if (!step) return;
 
+  // Lógica inteligente: se a etapa tem condição e ela for falsa, pula para a próxima!
   if (step.condition && !step.condition()) {
     stepIdx++;
     runStep(stepIdx);
@@ -1028,7 +1152,9 @@ function addAiMsg(html) {
   const msgs = document.getElementById('chat-messages');
   const div = document.createElement('div');
   div.className = 'msg ai';
-  div.innerHTML = `<div class="msg-avatar">N</div><div class="msg-bubble">${html}</div>`;
+  div.innerHTML = `
+    <div class="msg-avatar">N</div>
+    <div class="msg-bubble">${html}</div>`;
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
 }
@@ -1037,7 +1163,9 @@ function addUserMsg(text) {
   const msgs = document.getElementById('chat-messages');
   const div = document.createElement('div');
   div.className = 'msg user';
-  div.innerHTML = `<div class="msg-bubble">${text}</div><div class="msg-avatar" style="background:var(--green);color:white;">U</div>`;
+  div.innerHTML = `
+    <div class="msg-bubble">${text}</div>
+    <div class="msg-avatar" style="background:var(--green);color:white;">U</div>`;
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
 }
@@ -1127,14 +1255,16 @@ document.getElementById('chat-input').addEventListener('keydown', (e) => {
 function updateSidebar(idx) {
   const pct = Math.min(Math.round(((idx + 1) / flow.length) * 100), 100);
   document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = pct + '%';
 
+  // Atualizando o mapa para refletir o novo tamanho do array do fluxo
   const stepMap = {
-    0:0, 1:0,               
-    2:1, 3:1,               
-    4:2,                    
-    5:3, 6:3,               
-    7:4, 8:4, 9:4, 10:4, 11:4, 12:4, 
-    13:5, 14:5              
+    0:0, 1:0,               // 1. Identificação
+    2:1, 3:1,               // 2. Localização
+    4:2,                    // 3. Ambiente
+    5:3, 6:3,               // 4. Estilo
+    7:4, 8:4, 9:4, 10:4, 11:4, 12:4, // 5. Medidas (incluindo as condicionais)
+    13:5, 14:5              // 6. Resumo
   };
   
   const sidebarStep = stepMap[idx] ?? 0;
@@ -1158,6 +1288,7 @@ function showSummary() {
   document.getElementById('sum-fogao').textContent = userData.fogao || '—';
   document.getElementById('sum-outros').textContent = userData.outros || '—';
 
+  // Exibe os equipamentos dinâmicos no resumo apenas se foram preenchidos
   if(userData.microondas) {
       document.getElementById('row-microondas').style.display = 'flex';
       document.getElementById('sum-microondas').textContent = userData.microondas;
@@ -1177,6 +1308,16 @@ function showSummary() {
 }
 
 function sendToWhatsApp() {
+  // LÓGICA CONCEITUAL TIPO GOOGLE FORMS:
+  /*
+  fetch('SUA_URL_DO_WEBHOOK_AQUI', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(userData)
+  }).then(response => console.log('Dados enviados pro Sheets com sucesso!'));
+  */
+
+  // Formatando o texto dinamicamente para o WhatsApp
   let equipText = `*Geladeira:* ${userData.geladeira}\n*Fogão/Cooktop:* ${userData.fogao}\n`;
   if (userData.microondas) equipText += `*Microondas:* ${userData.microondas}\n`;
   if (userData.coifa) equipText += `*Coifa/Depurador:* ${userData.coifa}\n`;
@@ -1190,60 +1331,7 @@ function sendToWhatsApp() {
     equipText + `\n` +
     `_Pedido gerado pelo site Novaes Planejados_`
   );
-  window.open(`https://wa.me/5521999999999?text=${msg}`, '_blank');
-}
-
-// --- LÓGICA DE EDIÇÃO CONVERSACIONAL ---
-function startEditMode() {
-  document.getElementById('summary-overlay').classList.add('hidden');
-  setTimeout(showEditMenu, 500);
-}
-
-function showEditMenu() {
-  addAiMsg("Certo! O que você gostaria de corrigir?");
-  setOptions(["👤 Nome", "📱 Telefone", "📍 Endereço e Imóvel", "📐 Ambiente", "🔌 Equipamentos", "✅ Finalizar edição"], (val) => {
-    
-    if (val.includes("Finalizar edição")) {
-      addAiMsg("Gerando resumo atualizado...");
-      setTimeout(showSummary, 1500);
-      return;
-    }
-    
-    if (val.includes("Nome")) {
-      addAiMsg("Digite o nome correto:");
-      enableInput("Digite seu nome...");
-      awaitingInput = { onInput: (v) => { userData.nome = v; confirmEdit(); } };
-    } else if (val.includes("Telefone")) {
-      addAiMsg("Digite o telefone correto:");
-      enableInput("Telefone...");
-      awaitingInput = { onInput: (v) => { userData.tel = v; confirmEdit(); } };
-    } else if (val.includes("Endereço")) {
-      addAiMsg("Digite o endereço correto:");
-      enableInput("Endereço...");
-      awaitingInput = { onInput: (v) => { userData.end = v; confirmEdit(); } };
-    } else if (val.includes("Ambiente")) {
-      addAiMsg("Selecione os ambientes:");
-      setOptions(["🍳 Cozinha", "🛏 Quarto", "🛋 Sala", "🫧 Banheiro", "👕 Lavanderia", "💼 Home office"], (v) => { userData.ambiente = v; confirmEdit(); }, true);
-    } else if (val.includes("Equipamentos")) {
-      addAiMsg("Digite a lista de equipamentos atualizada (ex: Geladeira marca X, Fogão Y):");
-      enableInput("Equipamentos...");
-      awaitingInput = { onInput: (v) => { 
-        userData.geladeira = v; 
-        userData.fogao = "Ver acima"; 
-        userData.microondas = ""; 
-        userData.coifa = ""; 
-        userData.maquina = ""; 
-        confirmEdit(); 
-      } };
-    }
-  });
-}
-
-function confirmEdit() {
-  setTimeout(() => {
-    addAiMsg("Atualizado com sucesso! ✨");
-    setTimeout(showEditMenu, 1000);
-  }, 400);
+  window.open(`https://wa.me/5521980859778?text=${msg}`, '_blank');
 }
 </script>
 </body>
