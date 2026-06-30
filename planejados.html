@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Novaes Planejados — Solicitar Orçamento</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #7a9e7e;
+    --green-light: #a8c5a0;
+    --green-dark: #4a6b4e;
+    --green-bg: #eef4ef;
+    --green-muted: #c5d9c6;
+    --cream: #faf8f4;
+    --cream-dark: #f0ece4;
+    --brown: #8b7355;
+    --text: #2a2a2a;
+    --text-muted: #7a7a7a;
+    --white: #ffffff;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(250,248,244,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(122,158,126,0.15);
+    padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.25rem; font-weight: 500; letter-spacing: 0.12em;
+    color: var(--green-dark); text-transform: uppercase;
+  }
+  
+  .nav-tabs {
+    display: flex; gap: 2rem;
+    list-style: none;
+  }
+  .nav-tabs a {
+    font-size: 0.85rem; font-weight: 400; letter-spacing: 0.04em;
+    color: var(--text-muted); text-decoration: none;
+    transition: color 0.2s;
+    cursor: pointer;
+  }
+  .nav-tabs a:hover, .nav-tabs a.active { color: var(--green-dark); }
+  .nav-cta {
+    background: var(--green);
+    color: white; border: none; border-radius: 50px;
+    padding: 9px 20px; font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem; font-weight: 500; cursor: pointer;
+    transition: background 0.2s;
+  }
+  .nav-cta:hover { background: var(--green-dark); }
+
+  /* PAGES */
+  .page { display: none; min-height: 100vh; padding-top: 64px; }
+  .page.active { display: block; }
+
+  /* ====== HOME PAGE ====== */
+  .hero {
+    min-height: calc(100vh - 64px);
+    display: grid; grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 4rem 5%;
+    gap: 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: -20%; right: -5%;
+    width: 500px; height: 600px;
+    background: radial-gradient(ellipse, rgba(168,197,160,0.25) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .hero-left { position: relative; z-index: 1; }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--green-bg); border: 1px solid var(--green-muted);
+    border-radius: 50px; padding: 6px 16px;
+    font-size: 0.75rem; font-weight: 500; color: var(--green-dark);
+    letter-spacing: 0.06em; text-transform: uppercase;
+    margin-bottom: 1.5rem;
+  }
+  .hero-tag::before {
+    content: ''; width: 6px; height: 6px;
+    background: var(--green); border-radius: 50%;
+    display: inline-block;
+  }
+  .hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.8rem, 5vw, 4.2rem);
+    font-weight: 300; line-height: 1.12;
+    color: var(--text); margin-bottom: 1.5rem;
+  }
+  .hero h1 em { color: var(--green-dark); font-style: italic; }
+  .hero p {
+    font-size: 1rem; color: var(--text-muted); line-height: 1.75;
+    max-width: 440px; margin-bottom: 2.5rem;
+  }
+  .hero-btns { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--green-dark); color: white;
+    border: none; border-radius: 50px; padding: 14px 28px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500;
+    cursor: pointer; transition: all 0.2s; letter-spacing: 0.02em;
+  }
+  .btn-primary:hover { background: var(--green); transform: translateY(-1px); }
+  .btn-secondary {
+    background: transparent; color: var(--green-dark);
+    border: 1.5px solid var(--green-muted); border-radius: 50px;
+    padding: 13px 24px; font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem; font-weight: 400; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-secondary:hover { border-color: var(--green-dark); }
+
+  .hero-right {
+    position: relative;
+    display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;
+    gap: 14px; height: 480px;
+  }
+  .hero-img {
+    border-radius: var(--radius); overflow: hidden;
+    position: relative;
+  }
+  .hero-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .hero-img:first-child {
+    grid-column: 1; grid-row: 1 / 3;
+    border-radius: 120px 16px 16px 16px;
+  }
+  .hero-img:nth-child(2) { border-radius: 16px 120px 16px 16px; }
+  .hero-img:nth-child(3) { border-radius: 16px 16px 120px 16px; }
+  .hero-badge {
+    position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%);
+    background: white; border-radius: 50px; padding: 10px 20px;
+    display: flex; align-items: center; gap: 10px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    white-space: nowrap; z-index: 2;
+  }
+  .hero-badge-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; }
+  .hero-badge span { font-size: 0.8rem; font-weight: 500; color: var(--text); }
+
+  /* STATS */
+  .stats-bar {
+    background: var(--green-dark); padding: 2rem 5%;
+    display: flex; justify-content: center; gap: 5rem; flex-wrap: wrap;
+  }
+  .stat { text-align: center; }
+  .stat-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.2rem; font-weight: 300; color: white; display: block;
+  }
+  .stat-label { font-size: 0.75rem; color: rgba(255,255,255,0.65); letter-spacing: 0.06em; text-transform: uppercase; }
+
+  /* PORTFOLIO SECTION (HOME) */
+  .section { padding: 5rem 5%; }
+  .section-tag {
+    display: inline-block; background: var(--green-bg);
+    color: var(--green-dark); font-size: 0.72rem; font-weight: 500;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 5px 14px; border-radius: 50px; margin-bottom: 1rem;
+    border: 1px solid var(--green-muted);
+  }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 4vw, 3rem); font-weight: 300;
+    line-height: 1.2; margin-bottom: 0.75rem;
+  }
+  .section-title em { color: var(--green-dark); font-style: italic; }
+  .section-sub { color: var(--text-muted); font-size: 0.95rem; line-height: 1.7; max-width: 480px; margin-bottom: 2.5rem; }
+
+  .portfolio-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-rows: 260px 260px;
+    gap: 14px;
+  }
+  .portfolio-item {
+    border-radius: var(--radius); overflow: hidden;
+    position: relative; cursor: pointer;
+    background: var(--cream-dark);
+  }
+  .portfolio-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s; }
+  .portfolio-item:hover img { transform: scale(1.04); }
+  .portfolio-item:first-child { grid-row: 1 / 3; border-radius: 24px; }
+  .portfolio-overlay {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: linear-gradient(transparent, rgba(30,50,32,0.75));
+    padding: 1.5rem 1rem 1rem;
+    opacity: 0; transition: opacity 0.3s;
+    display: flex; align-items: flex-end;
+  }
+  .portfolio-item:hover .portfolio-overlay { opacity: 1; }
+  .portfolio-label {
+    font-size: 0.8rem; color: white; font-weight: 500;
+    background: rgba(255,255,255,0.18); border-radius: 50px;
+    padding: 4px 12px; backdrop-filter: blur(4px);
+  }
+
+  /* ====== SOBRE NÓS PAGE ====== */
+  .sobre-hero {
+    background: var(--green-dark);
+    padding: 5rem 5% 4rem;
+    text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .sobre-hero::before {
+    content: '';
+    position: absolute; top: -50%; left: -20%;
+    width: 600px; height: 600px;
+    background: radial-gradient(ellipse, rgba(255,255,255,0.06) 0%, transparent 60%);
+    border-radius: 50%;
+  }
+  .sobre-hero h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 300;
+    color: white; line-height: 1.15; margin-bottom: 1rem;
+  }
+  .sobre-hero h2 em { font-style: italic; color: var(--green-light); }
+  .sobre-hero p { color: rgba(255,255,255,0.75); font-size: 1rem; line-height: 1.75; max-width: 560px; margin: 0 auto; }
+
+  .sobre-content { padding: 4rem 5%; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+  .sobre-img-wrap {
+    position: relative; border-radius: var(--radius); overflow: hidden;
+    height: 420px;
+  }
+  .sobre-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+  .sobre-img-badge {
+    position: absolute; bottom: 1.5rem; right: 1.5rem;
+    background: white; border-radius: var(--radius-sm);
+    padding: 1rem 1.25rem; box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  }
+  .sobre-img-badge .num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.2rem; font-weight: 300; color: var(--green-dark); display: block;
+  }
+  .sobre-img-badge .lbl { font-size: 0.72rem; color: var(--text-muted); letter-spacing: 0.05em; text-transform: uppercase; }
+  .sobre-text h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem; font-weight: 300; margin-bottom: 1rem;
+  }
+  .sobre-text p { color: var(--text-muted); line-height: 1.8; font-size: 0.95rem; margin-bottom: 1rem; }
+  .valores-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 1.5rem; }
+  .valor-card {
+    background: var(--green-bg); border: 1px solid var(--green-muted);
+    border-radius: var(--radius-sm); padding: 1rem;
+  }
+  .valor-card .icon { font-size: 1.2rem; margin-bottom: 0.4rem; }
+  .valor-card h4 { font-size: 0.85rem; font-weight: 500; color: var(--green-dark); margin-bottom: 0.2rem; }
+  .valor-card p { font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; }
+
+  /* FOUNDERS */
+  .founders { padding: 3rem 5% 5rem; }
+  .founders h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.8rem; font-weight: 300; text-align: center; margin-bottom: 2.5rem;
+  }
+  .founders-grid { display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; }
+  .founder-card {
+    background: white; border-radius: var(--radius); padding: 2rem;
+    text-align: center; max-width: 280px; min-width: 220px; flex: 1;
+    border: 1px solid rgba(122,158,126,0.2);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  }
+  .founder-avatar {
+    width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 1rem;
+    background: var(--green-bg);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.8rem; color: var(--green-dark);
+    border: 2px solid var(--green-muted);
+  }
+  .founder-card h4 { font-size: 0.95rem; font-weight: 500; margin-bottom: 0.25rem; }
+  .founder-card span { font-size: 0.78rem; color: var(--green-dark); }
+
+  /* ====== ORÇAMENTO PAGE (CHAT STYLE) ====== */
+  .orcamento-page {
+    min-height: calc(100vh - 64px);
+    display: grid;
+    grid-template-columns: 300px 1fr;
+  }
+
+  .orcamento-sidebar {
+    background: var(--green-dark);
+    padding: 2rem 1.5rem;
+    position: relative; overflow: hidden;
+  }
+  .orcamento-sidebar::before {
+    content: '';
+    position: absolute; bottom: -60px; right: -60px;
+    width: 200px; height: 200px;
+    background: rgba(255,255,255,0.04); border-radius: 50%;
+  }
+  .sidebar-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem; font-weight: 300; color: white;
+    margin-bottom: 0.5rem; line-height: 1.2;
+  }
+  .sidebar-sub { font-size: 0.78rem; color: rgba(255,255,255,0.6); margin-bottom: 2rem; line-height: 1.6; }
+  .steps-list { list-style: none; }
+  .step-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.08);
+    position: relative;
+  }
+  .step-item:last-child { border-bottom: none; }
+  .step-num {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.72rem; color: rgba(255,255,255,0.5);
+    flex-shrink: 0; transition: all 0.3s;
+  }
+  .step-item.done .step-num {
+    background: var(--green); border-color: var(--green); color: white;
+  }
+  .step-item.active .step-num {
+    background: white; border-color: white; color: var(--green-dark);
+    font-weight: 600;
+  }
+  .step-info { flex: 1; }
+  .step-label { font-size: 0.82rem; color: rgba(255,255,255,0.5); font-weight: 400; transition: color 0.3s; }
+  .step-item.active .step-label { color: white; font-weight: 500; }
+  .step-item.done .step-label { color: rgba(255,255,255,0.7); }
+  .step-desc { font-size: 0.7rem; color: rgba(255,255,255,0.35); margin-top: 2px; }
+
+  .progress-bar-wrap { margin-bottom: 2rem; }
+  .progress-label { font-size: 0.7rem; color: rgba(255,255,255,0.5); margin-bottom: 6px; display: flex; justify-content: space-between; }
+  .progress-bar { height: 4px; background: rgba(255,255,255,0.15); border-radius: 4px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--green-light); border-radius: 4px; transition: width 0.5s ease; }
+
+  /* CHAT AREA CORREÇÕES */
+  .chat-area {
+    display: flex; flex-direction: column;
+    background: var(--cream);
+    height: calc(100vh - 64px);
+    width: 100%;
+    overflow: hidden;
+  }
+  
+  .chat-header {
+    padding: 1.25rem 2rem;
+    border-bottom: 1px solid rgba(122,158,126,0.15);
+    background: white;
+    display: flex; align-items: center; gap: 12px;
+    width: 100%;
+  }
+
+  .chat-header-info h4 { font-size: 0.9rem; font-weight: 500; }
+  .chat-header-info span { font-size: 0.75rem; color: var(--green-dark); }
+
+  .chat-messages {
+    flex: 1; overflow-y: auto; padding: 1.5rem 2rem;
+    display: flex !important; 
+    flex-direction: column !important;
+    gap: 1.5rem;
+    width: 100%;
+  }
+  
+  .chat-messages::-webkit-scrollbar { width: 4px; }
+  .chat-messages::-webkit-scrollbar-track { background: transparent; }
+  .chat-messages::-webkit-scrollbar-thumb { background: var(--green-muted); border-radius: 4px; }
+
+  .msg {
+    display: flex; gap: 10px; align-items: flex-end;
+    animation: fadeUp 0.3s ease;
+    width: 100%;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .msg.ai {
+    justify-content: flex-start;
+  }
+
+  .msg.user { 
+    flex-direction: row-reverse; 
+    justify-content: flex-start;
+  }
+
+  .msg-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    flex-shrink: 0; overflow: hidden;
+    background: var(--green-bg); border: 1.5px solid var(--green-muted);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cormorant Garamond', serif; font-size: 0.95rem; color: var(--green-dark);
+  }
+  
+  .msg-bubble {
+    max-width: 75%; padding: 12px 16px;
+    border-radius: 18px; font-size: 0.88rem; line-height: 1.65;
+    width: fit-content;
+  }
+  
+  .msg.ai .msg-bubble {
+    background: white; color: var(--text);
+    border: 1px solid rgba(122,158,126,0.15);
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+  
+  .msg.user .msg-bubble {
+    background: var(--green-dark); color: white;
+    border-bottom-right-radius: 4px;
+  }
+  
+  .typing { display: flex; gap: 5px; align-items: center; padding: 14px 16px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green-muted); animation: bounce 1.2s infinite; }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
+
+  /* INPUT AREA */
+  .chat-input-area {
+    padding: 1rem 2rem 1.25rem;
+    background: white;
+    border-top: 1px solid rgba(122,158,126,0.15);
+  }
+  .options-grid {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  .opt-btn {
+    background: var(--green-bg); border: 1.5px solid var(--green-muted);
+    color: var(--green-dark); border-radius: 50px; padding: 8px 16px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 400;
+    cursor: pointer; transition: all 0.18s;
+  }
+  .opt-btn:hover { background: var(--green); color: white; border-color: var(--green); }
+  .opt-btn.selected { background: var(--green-dark); color: white; border-color: var(--green-dark); }
+
+  .input-row {
+    display: flex; gap: 10px; align-items: flex-end;
+  }
+  .chat-input {
+    flex: 1; border: 1.5px solid rgba(122,158,126,0.3);
+    border-radius: 12px; padding: 11px 16px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.88rem;
+    background: var(--cream); color: var(--text);
+    resize: none; outline: none; transition: border-color 0.2s;
+    min-height: 44px; max-height: 100px;
+  }
+  .chat-input:focus { border-color: var(--green); }
+  .chat-input::placeholder { color: var(--text-muted); }
+  .send-btn-chat {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: var(--green-dark); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+  .send-btn-chat:hover { background: var(--green); }
+  .send-btn-chat svg { width: 18px; height: 18px; fill: white; }
+
+  /* SUMMARY PAGE */
+  .summary-page { padding: 3rem 5%; max-width: 900px; margin: 0 auto; }
+  .summary-header { text-align: center; margin-bottom: 3rem; }
+  .summary-header h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.5rem; font-weight: 300; margin-bottom: 0.5rem;
+  }
+  .summary-card {
+    background: white; border-radius: var(--radius);
+    border: 1px solid rgba(122,158,126,0.2); padding: 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  }
+  .summary-card h3 { font-size: 0.72rem; font-weight: 500; color: var(--green-dark); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1.25rem; }
+  .summary-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--cream-dark); font-size: 0.88rem; }
+  .summary-row:last-child { border-bottom: none; }
+  .summary-row span:first-child { color: var(--text-muted); }
+  .summary-row span:last-child { font-weight: 500; }
+  .whats-btn {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    background: #25D366; color: white; border: none;
+    border-radius: 50px; padding: 14px 32px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 500;
+    cursor: pointer; width: 100%; transition: all 0.2s;
+    margin-top: 1.5rem;
+  }
+  .whats-btn:hover { background: #1fba59; transform: translateY(-1px); }
+  .whats-btn svg { width: 22px; height: 22px; fill: white; }
+
+  /* FOOTER */
+  footer {
+    background: var(--text); color: rgba(255,255,255,0.6);
+    padding: 2rem 5%; text-align: center;
+    font-size: 0.78rem; line-height: 1.7;
+  }
+  footer strong { color: var(--green-light); }
+
+  /* ====== MEDIA QUERIES (RESPONSIVIDADE EXTRA) ====== */
+  @media(max-width: 992px) {
+    .hero { gap: 2rem; }
+    .hero h1 { font-size: 3rem; }
+    .hero-right { height: 400px; }
+  }
+
+  @media(max-width: 768px) {
+    nav { padding: 0 1.5rem; }
+    .hero { grid-template-columns: 1fr; padding: 2rem 5%; }
+    .hero h1 { font-size: 2.8rem; }
+    .hero-right { display: none; }
+    
+    .portfolio-grid { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+    .portfolio-item:first-child { grid-row: auto; border-radius: var(--radius); }
+    
+    .sobre-content { grid-template-columns: 1fr; gap: 2.5rem; }
+    .sobre-img-wrap { height: 320px; }
+    
+    .orcamento-page { grid-template-columns: 1fr; }
+    .orcamento-sidebar { display: none; }
+    
+    .nav-tabs { display: none; }
+    .stats-bar { gap: 2rem; flex-wrap: wrap; padding: 2rem 5%; }
+  }
+
+  @media(max-width: 480px) {
+    .nav-logo-img { height: 26px; }
+    .nav-cta { padding: 8px 14px; font-size: 0.78rem; }
+    
+    .hero { padding: 2rem 5% 3rem; }
+    .hero h1 { font-size: 2.3rem; }
+    
+    .portfolio-grid { grid-template-columns: 1fr; gap: 16px; }
+    .portfolio-item { height: 240px; }
+    
+    .sobre-hero h2 { font-size: 2rem; }
+    .valores-grid { grid-template-columns: 1fr; }
+    .founder-card { max-width: 100%; }
+
+    .chat-header { padding: 1rem 1.5rem; }
+    .chat-messages { padding: 1.5rem 1.5rem; }
+    .chat-input-area { padding: 1rem 1.5rem 1.25rem; }
+    .msg-bubble { max-width: 90%; font-size: 0.85rem; }
+  }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">
+    NOVAES PLANEJADOS
+  </div>
+  <ul class="nav-tabs">
+    <li><a onclick="showPage('home')" class="active" id="nav-home">Início</a></li>
+    <li><a onclick="showPage('portfolio')" id="nav-portfolio">Portfólio</a></li>
+    <li><a onclick="showPage('sobre')" id="nav-sobre">Sobre nós</a></li>
+    <li><a onclick="showPage('orcamento')" id="nav-orcamento">Orçamento</a></li>
+  </ul>
+  <button class="nav-cta" onclick="showPage('orcamento')">Solicitar orçamento</button>
+</nav>
+
+<div class="page active" id="page-home">
+  <section class="hero">
+    <div class="hero-left">
+      <div class="hero-tag">Campo Grande, Rio de Janeiro</div>
+      <h1>Transformamos <em>sonhos</em> em ambientes únicos</h1>
+      <p>Móveis planejados feitos sob medida para a sua vida. Do projeto à entrega, cada detalhe é pensado com cuidado e personalidade.</p>
+      <div class="hero-btns">
+        <button class="btn-primary" onclick="showPage('orcamento')">Solicitar orçamento grátis</button>
+        <button class="btn-secondary" onclick="showPage('portfolio')">Ver projetos</button>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-img">
+        <img src="assets/image_6ed192.jpg" alt="Cozinha planejada moderna grafite" />
+      </div>
+      <div class="hero-img">
+        <img src="assets/image_6ed1ae.jpg" alt="Detalhe de móvel e gavetas" />
+      </div>
+      <div class="hero-img">
+        <img src="assets/image_6ed1b6.jpg" alt="Detalhe de pia com fita LED" />
+      </div>
+      <div class="hero-badge">
+        <div class="hero-badge-dot"></div>
+        <span>+50 projetos entregues em Campo Grande</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="stats-bar">
+    <div class="stat"><span class="stat-num">+50</span><span class="stat-label">Projetos entregues</span></div>
+    <div class="stat"><span class="stat-num">30</span><span class="stat-label">Dias para entrega</span></div>
+    <div class="stat"><span class="stat-num">100%</span><span class="stat-label">Personalizado</span></div>
+    <div class="stat"><span class="stat-num">12x</span><span class="stat-label">No cartão</span></div>
+  </div>
+
+  <section class="section">
+    <div class="section-tag">Nossos projetos</div>
+    <h2 class="section-title">Cada ambiente tem <em>uma história</em></h2>
+    <p class="section-sub">Cozinhas, quartos, salas e muito mais — planejados para o seu jeito de viver.</p>
+    <div class="portfolio-grid">
+      <div class="portfolio-item">
+        <img src="assets/image_6ed196.jpg" alt="Cozinha com bancada" />
+        <div class="portfolio-overlay"><span class="portfolio-label">Cozinha Grafite & Preto — Campo Grande</span></div>
+      </div>
+      <div class="portfolio-item">
+        <img src="assets/image_6ed1b6.jpg" alt="Cozinha detalhe pia" />
+        <div class="portfolio-overlay"><span class="portfolio-label">Iluminação em LED</span></div>
+      </div>
+      <div class="portfolio-item">
+        <img src="assets/image_6ed1ae.jpg" alt="Armário detalhe" />
+        <div class="portfolio-overlay"><span class="portfolio-label">Acabamentos e Puxadores</span></div>
+      </div>
+      <div class="portfolio-item">
+        <img src="assets/image_6ed115.jpg" alt="Projeto 3D Cozinha" />
+        <div class="portfolio-overlay"><span class="portfolio-label">Projeto 3D (Render)</span></div>
+      </div>
+      <div class="portfolio-item">
+        <img src="assets/image_6ed119.jpg" alt="Cozinha Executada" />
+        <div class="portfolio-overlay"><span class="portfolio-label">Projeto Finalizado</span></div>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top:2.5rem;">
+      <button class="btn-secondary" onclick="showPage('portfolio')">Ver todos os projetos</button>
+    </div>
+  </section>
+
+  <footer>
+    <strong>Novaes Planejados</strong> · Campo Grande, Rio de Janeiro · Fundadores: Marcela e Carlos Daniel<br>
+    @novaesplanejadoss · (21) 99999-9999 / (21) 99999-9999
+  </footer>
+</div>
+
+<div class="page" id="page-portfolio">
+  <section class="section">
+    <div class="section-tag">Portfólio completo</div>
+    <h2 class="section-title"><em>Inspire-se</em> com nossos projetos</h2>
+    <p class="section-sub">Cada projeto é único. Clique para se inspirar e use isso na hora de solicitar seu orçamento.</p>
+
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:2rem;">
+      <button class="opt-btn selected" onclick="filterPortfolio('todos', this)">Todos</button>
+      <button class="opt-btn" onclick="filterPortfolio('cozinha', this)">Cozinhas</button>
+      <button class="opt-btn" onclick="filterPortfolio('projeto3d', this)">Projetos 3D</button>
+    </div>
+
+    <div id="portfolio-full-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:16px;">
+      <div class="portfolio-item" data-cat="cozinha" style="height:220px; border-radius:var(--radius);">
+        <img src="assets/image_6ed192.jpg" alt="Cozinha Grafite" />
+        <div class="portfolio-overlay"><span class="portfolio-label">Cozinha moderna — Grafite com painel ripado</span></div>
+      </div>
+      <div class="portfolio-item" data-cat="cozinha" style="height:220px; border-radius:var(--radius);">
+        <img src="assets/image_6ed196.jpg" alt="Cozinha com Bancada" />
+        <div class="portfolio-overlay"><span class="portfolio-label">Integração de ambientes — Bancada em Granito Preto</span></div>
+      </div>
+      <div class="portfolio-item" data-cat="cozinha" style="height:220px; border-radius:var(--radius);">
+        <img src="assets/image_6ed1b6.jpg" alt="Cozinha LED" />
+        <div class="portfolio-overlay"><span class="portfolio-label">Detalhe iluminação LED — Sofisticação e praticidade</span></div>
+      </div>
+      <div class="portfolio-item" data-cat="cozinha" style="height:220px; border-radius:var(--radius);">
+        <img src="assets/image_6ed1ae.jpg" alt="Detalhe gavetas" />
+        <div class="portfolio-overlay"><span class="portfolio-label">Precisão no acabamento — Puxadores tipo Gola</span></div>
+      </div>
+      <div class="portfolio-item" data-cat="projeto3d" style="height:220px; border-radius:var(--radius);">
+        <img src="assets/image_6ed115.jpg" alt="Render Cozinha" />
+        <div class="portfolio-overlay"><span class="portfolio-label">Apresentação de Projeto 3D</span></div>
+      </div>
+      <div class="portfolio-item" data-cat="cozinha" style="height:220px; border-radius:var(--radius);">
+        <img src="assets/image_6ed119.jpg" alt="Cozinha Executada" />
+        <div class="portfolio-overlay"><span class="portfolio-label">Execução perfeita do 3D para a realidade</span></div>
+      </div>
+    </div>
+
+    <div style="text-align:center; margin-top:2.5rem;">
+      <button class="btn-primary" onclick="showPage('orcamento')">Gostei! Quero um projeto assim</button>
+    </div>
+  </section>
+  <footer>
+    <strong>Novaes Planejados</strong> · Campo Grande, Rio de Janeiro<br>
+    @novaesplanejadoss
+  </footer>
+</div>
+
+<div class="page" id="page-sobre">
+  <div class="sobre-hero">
+    <div class="section-tag" style="background:rgba(255,255,255,0.12); border-color:rgba(255,255,255,0.2); color:rgba(255,255,255,0.8);">Nossa história</div>
+    <h2>Feitos com <em>propósito</em>,<br>entregues com alma</h2>
+    <p>A Novaes Planejados nasceu do desejo de transformar espaços comuns em ambientes que refletem a personalidade de quem os habita.</p>
+  </div>
+
+  <div class="sobre-content">
+    <div class="sobre-img-wrap" style="background: var(--white); display: flex; align-items: center; justify-content: center; padding: 2rem;">
+      <img src="assets/image_6ed0fa.png" alt="Logo Novaes" style="object-fit: contain; width: 80%;" />
+      <div class="sobre-img-badge">
+        <span class="num">+50</span>
+        <span class="lbl">sonhos realizados</span>
+      </div>
+    </div>
+    <div class="sobre-text">
+      <h3>Personalidade em cada detalhe</h3>
+      <p>Marcela e Carlos Daniel fundaram a Novaes com uma missão clara: nenhum ambiente deve ser genérico. Cada família tem uma rotina, um jeito de viver, um sonho de espaço. E é exatamente isso que buscamos entender antes de começar qualquer projeto.</p>
+      <p>Baseados em Campo Grande, Rio de Janeiro, atendemos famílias que querem mais do que móveis — querem um lar que funcione de verdade, que seja bonito, durável e completamente deles.</p>
+      <p>Do primeiro contato ao último acabamento, estamos presentes. Essa é a nossa promessa.</p>
+      <div class="valores-grid">
+        <div class="valor-card">
+          <div class="icon">✦</div>
+          <h4>Qualidade</h4>
+          <p>Materiais selecionados e acabamento impecável em cada projeto.</p>
+        </div>
+        <div class="valor-card">
+          <div class="icon">◈</div>
+          <h4>Personalização</h4>
+          <p>Nenhum projeto é cópia de outro. Cada um é único como quem encomenda.</p>
+        </div>
+        <div class="valor-card">
+          <div class="icon">◉</div>
+          <h4>Transparência</h4>
+          <p>Orçamento claro, sem surpresas. Você sabe exatamente o que está contratando.</p>
+        </div>
+        <div class="valor-card">
+          <div class="icon">❋</div>
+          <h4>Cuidado humano</h4>
+          <p>Atendimento próximo, respeitoso e feito por pessoas que se importam.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="founders">
+    <h3>Quem faz acontecer</h3>
+    <div class="founders-grid">
+      <div class="founder-card">
+        <div class="founder-avatar">M</div>
+        <h4>Marcela</h4>
+        <span>Co-fundadora · Design & Atendimento</span>
+      </div>
+      <div class="founder-card">
+        <div class="founder-avatar">C</div>
+        <h4>Carlos Daniel</h4>
+        <span>Co-fundador · Projetos & Execução</span>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <strong>Novaes Planejados</strong> · Campo Grande, Rio de Janeiro · Fundadores: Marcela e Carlos Daniel<br>
+    @novaesplanejadoss
+  </footer>
+</div>
+
+<div class="page" id="page-orcamento">
+  <div class="orcamento-page">
+    <div class="orcamento-sidebar">
+      <div class="sidebar-title">Solicitar<br>orçamento</div>
+      <p class="sidebar-sub">Nossa assistente Nina vai te guiar em poucos minutos</p>
+
+      <div class="progress-bar-wrap">
+        <div class="progress-label">
+          <span>Progresso</span>
+          <span id="progress-pct">0%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+        </div>
+      </div>
+
+      <ul class="steps-list" id="steps-list">
+        <li class="step-item active" data-step="0">
+          <div class="step-num">1</div>
+          <div class="step-info">
+            <div class="step-label">Identificação</div>
+            <div class="step-desc">Nome e contato</div>
+          </div>
+        </li>
+        <li class="step-item" data-step="1">
+          <div class="step-num">2</div>
+          <div class="step-info">
+            <div class="step-label">Localização</div>
+            <div class="step-desc">Endereço e imóvel</div>
+          </div>
+        </li>
+        <li class="step-item" data-step="2">
+          <div class="step-num">3</div>
+          <div class="step-info">
+            <div class="step-label">Ambiente</div>
+            <div class="step-desc">Qual cômodo?</div>
+          </div>
+        </li>
+        <li class="step-item" data-step="3">
+          <div class="step-num">4</div>
+          <div class="step-info">
+            <div class="step-label">Estilo</div>
+            <div class="step-desc">Cores e inspirações</div>
+          </div>
+        </li>
+        <li class="step-item" data-step="4">
+          <div class="step-num">5</div>
+          <div class="step-info">
+            <div class="step-label">Medidas</div>
+            <div class="step-desc">Eletrodomésticos</div>
+          </div>
+        </li>
+        <li class="step-item" data-step="5">
+          <div class="step-num">6</div>
+          <div class="step-info">
+            <div class="step-label">Resumo</div>
+            <div class="step-desc">Visita e envio</div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="chat-area">
+      <div class="chat-header">
+        <div class="ai-avatar">N<div class="ai-online"></div></div>
+        <div class="chat-header-info">
+          <h4>Nina · Novaes Planejados</h4>
+          <span>● Online agora</span>
+        </div>
+      </div>
+
+      <div class="chat-messages" id="chat-messages">
+        </div>
+
+      <div class="chat-input-area" id="input-area">
+        <div class="options-grid" id="options-grid"></div>
+        <div class="upload-area" id="upload-area">
+
+        </div>
+        <div class="input-row">
+          <textarea class="chat-input" id="chat-input" placeholder="Digite aqui..." rows="1"></textarea>
+          <button class="send-btn-chat" onclick="sendUserMsg()">
+            <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="summary-overlay" class="hidden" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(250,248,244,0.97);z-index:200;overflow-y:auto;padding-top:80px;">
+  <div class="summary-page">
+    <div class="summary-header">
+      <div class="section-tag">Pronto!</div>
+      <h2>Seu pedido de <em>orçamento</em></h2>
+      <p style="color:var(--text-muted);font-size:0.9rem;margin-top:0.5rem;">Revise as informações abaixo e envie para nossa equipe via WhatsApp.</p>
+    </div>
+
+    <div class="summary-card">
+      <h3>Dados pessoais</h3>
+      <div class="summary-row"><span>Nome</span><span id="sum-nome">—</span></div>
+      <div class="summary-row"><span>Telefone</span><span id="sum-tel">—</span></div>
+      <div class="summary-row"><span>Endereço</span><span id="sum-end">—</span></div>
+      <div class="summary-row"><span>Tipo de imóvel</span><span id="sum-tipo">—</span></div>
+      <div class="summary-row"><span>Visita técnica</span><span id="sum-visita">—</span></div>
+    </div>
+
+    <div class="summary-card">
+      <h3>Projeto</h3>
+      <div class="summary-row"><span>Ambiente</span><span id="sum-ambiente">—</span></div>
+      <div class="summary-row"><span>Cor preferida</span><span id="sum-cor">—</span></div>
+      <div class="summary-row"><span>Estilo</span><span id="sum-estilo">—</span></div>
+    </div>
+
+    <div class="summary-card">
+      <h3>Equipamentos</h3>
+      <div class="summary-row"><span>Geladeira</span><span id="sum-geladeira">—</span></div>
+      <div class="summary-row"><span>Fogão / Cooktop</span><span id="sum-fogao">—</span></div>
+      
+      <div class="summary-row" id="row-microondas" style="display:none;"><span>Microondas</span><span id="sum-microondas">—</span></div>
+      <div class="summary-row" id="row-coifa" style="display:none;"><span>Coifa/Depurador</span><span id="sum-coifa">—</span></div>
+      <div class="summary-row" id="row-maquina" style="display:none;"><span>Máquina de lavar</span><span id="sum-maquina">—</span></div>
+      
+      <div class="summary-row"><span>Outros Itens</span><span id="sum-outros">—</span></div>
+    </div>
+
+    <button class="whats-btn" onclick="sendToWhatsApp()">
+      <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Enviar para a equipe Novaes via WhatsApp
+    </button>
+    <div style="text-align:center;margin-top:1rem;">
+      <button class="btn-secondary" onclick="document.getElementById('summary-overlay').classList.add('hidden')">Voltar e editar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---- NAVIGATION ----
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-tabs a').forEach(a => a.classList.remove('active'));
+  const nav = document.getElementById('nav-' + id);
+  if (nav) nav.classList.add('active');
+  window.scrollTo(0, 0);
+  if (id === 'orcamento' && !chatStarted) startChat();
+}
+
+// ---- PORTFOLIO FILTER ----
+function filterPortfolio(cat, btn) {
+  document.querySelectorAll('#portfolio-full-grid .portfolio-item').forEach(item => {
+    item.style.display = (cat === 'todos' || item.dataset.cat === cat) ? 'block' : 'none';
+  });
+  document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+// ---- CHAT ENGINE ----
+let chatStarted = false;
+let stepIdx = 0;
+// Atualizei os dados do usuário com as novas chaves
+let userData = { nome:'', tel:'', end:'', tipo:'', visita:'', ambiente:'', cor:'', estilo:'', geladeira:'', fogao:'', outros:'', microondas:'', coifa:'', maquina:'' };
+let awaitingInput = null;
+
+// Máquina de estados robusta e condicional
+const flow = [
+  // 0. Identificação (Input Nome)
+  {
+    messages: [
+      { delay: 400, text: "Olá! 🌿 Sou a Nina, assistente da <strong>Novaes Planejados</strong>. Estou aqui para te ajudar a solicitar seu orçamento de móveis planejados." },
+      { delay: 1600, text: "Vamos começar? Qual é o seu <strong>nome completo</strong>?" }
+    ],
+    input: true,
+    inputPlaceholder: "Digite seu nome...",
+    onInput: (val) => { userData.nome = val; }
+  },
+  // 1. Identificação (Input Tel)
+  {
+    messages: [
+      { delay: 400, text: (u) => `Prazer, <strong>${u.nome}</strong>! 😊 Agora me passa o seu <strong>número de WhatsApp</strong> com DDD.` }
+    ],
+    input: true,
+    inputPlaceholder: "(21) 99999-9999",
+    onInput: (val) => { userData.tel = val; }
+  },
+  // 2. Localização (Input Endereço)
+  {
+    messages: [
+      { delay: 400, text: "Perfeito! Agora preciso do seu <strong>endereço completo</strong> — rua, número, bairro e cidade — para verificar se conseguimos atender sua região." }
+    ],
+    input: true,
+    inputPlaceholder: "Ex: Rua das Flores, 123 — Campo Grande, RJ",
+    onInput: (val) => { userData.end = val; }
+  },
+  // 3. Localização (Opção Imóvel)
+  {
+    messages: [
+      { delay: 400, text: "Anotado! E esse endereço é de <strong>apartamento ou casa</strong>?" }
+    ],
+    options: ["🏠 Casa", "🏢 Apartamento"],
+    onOption: (val) => { userData.tipo = val; }
+  },
+  // 4. Ambiente (Opção Multi)
+  {
+    messages: [
+      { delay: 400, text: "Certo! Me conta: qual <strong>ambiente</strong> você quer planejar? (pode escolher mais de um)" }
+    ],
+    options: ["🍳 Cozinha", "🛏 Quarto", "🛋 Sala", "🫧 Banheiro", "👕 Lavanderia", "💼 Home office"],
+    multiSelect: true,
+    onOption: (val) => { userData.ambiente = val; }
+  },
+  // 5. Estilo (Opção)
+  {
+    messages: [
+      { delay: 400, text: "Que bacana! E qual <strong>estilo</strong> mais combina com você para esse projeto?" }
+    ],
+    options: ["✨ Moderno e clean", "🤍 Minimalista branco", "🖤 Escuro e sofisticado", "🌿 Natural e acolhedor", "💡 Não sei ainda, preciso de inspiração!"],
+    onOption: (val) => {
+      userData.estilo = val;
+      if (val.includes("inspiração")) {
+        setTimeout(() => {
+          addAiMsg("Sem pressão! 😊 Depois você pode dar uma olhada no nosso portfólio para se inspirar e ver o que mais te chama a atenção.");
+        }, 800);
+      }
+    }
+  },
+  // 6. Cor (Opção)
+  {
+    messages: [
+      { delay: 800, text: "Você tem alguma <strong>cor em mente</strong> para os móveis?" }
+    ],
+    options: ["⬜ Branco", "🩶 Cinza / Grafite", "🤎 Madeira / Natural", "🖤 Preto", "💚 Verde / Sage", "🎨 Ainda não sei"],
+    onOption: (val) => { userData.cor = val; }
+  },
+  // 7. Medidas (Input Geladeira)
+  {
+    messages: [
+      { delay: 400, text: "Quase lá! 🎉 Para deixarmos tudo sob medida, preciso saber quais eletrodomésticos você tem ou planeja ter. Qual é o modelo da sua <strong>geladeira</strong>? (ex: Brastemp 400L duplex)" }
+    ],
+    input: true,
+    inputPlaceholder: "Marca e modelo da geladeira...",
+    onInput: (val) => { userData.geladeira = val; }
+  },
+  // 8. Medidas (Input Fogão)
+  {
+    messages: [
+      { delay: 400, text: "E o <strong>fogão ou cooktop</strong>? (ex: Electrolux 5 bocas, embutir)" }
+    ],
+    input: true,
+    inputPlaceholder: "Modelo do fogão/cooktop...",
+    onInput: (val) => { userData.fogao = val; }
+  },
+  // 9. Medidas (Opção Multi Outros)
+  {
+    messages: [
+      { delay: 400, text: "Tem <strong>microondas, coifa ou máquina de lavar</strong> para incluir no projeto?" }
+    ],
+    options: ["Sim, tenho microondas", "Sim, tenho coifa", "Sim, tenho máquina de lavar", "Não por enquanto"],
+    multiSelect: true,
+    onOption: (val) => { userData.outros = val; }
+  },
+  // 10. Condicional - Microondas
+  {
+    condition: () => userData.outros.includes("microondas"),
+    messages: [
+      { delay: 400, text: "Certo! Qual é a marca e o modelo do seu <strong>microondas</strong>? (ex: Electrolux 31L de embutir)" }
+    ],
+    input: true,
+    inputPlaceholder: "Modelo do microondas...",
+    onInput: (val) => { userData.microondas = val; }
+  },
+  // 11. Condicional - Coifa
+  {
+    condition: () => userData.outros.includes("coifa"),
+    messages: [
+      { delay: 400, text: "E sobre a <strong>coifa ou depurador</strong>, qual é o modelo? (ex: Tramontina 90cm parede)" }
+    ],
+    input: true,
+    inputPlaceholder: "Modelo da coifa...",
+    onInput: (val) => { userData.coifa = val; }
+  },
+  // 12. Condicional - Máquina de Lavar
+  {
+    condition: () => userData.outros.includes("máquina de lavar"),
+    messages: [
+      { delay: 400, text: "Para a lavanderia, qual é a sua <strong>máquina de lavar</strong>? (ex: Samsung Lava e Seca 11kg frontal)" }
+    ],
+    input: true,
+    inputPlaceholder: "Modelo da máquina...",
+    onInput: (val) => { userData.maquina = val; }
+  },
+  // 13. Visita Técnica (Opção)
+  {
+    messages: [
+      { delay: 600, text: "Ótimo! 📍 Nossos especialistas adoram fazer uma <strong>visita técnica</strong> para tomar as medidas com precisão e te mostrar nosso catálogo de cores pessoalmente. Você gostaria de agendar?" }
+    ],
+    options: ["✅ Sim, quero agendar visita", "📱 Prefiro enviar as informações online"],
+    onOption: (val) => {
+      userData.visita = val.includes("Sim") ? "Sim" : "Não";
+      if (userData.visita === "Sim") {
+        setTimeout(() => {
+          addAiMsg("Perfeito! 🗓 Um dos nossos agentes entrará em contato para tratar a visita.");
+        }, 800);
+      } else {
+        setTimeout(() => {
+          addAiMsg("Sem problema! Já temos a base de informações que precisamos para montar seu projeto inicial. 📐");
+        }, 800);
+      }
+    }
+  },
+  // 14. Final (Apresenta o resumo)
+  {
+    messages: [
+      { delay: 2000, text: "🌟 Incrível! Já temos tudo que precisamos." },
+      { delay: 1000, text: (u) => `Vou gerar agora o resumo do seu pedido, <strong>${u.nome.split(' ')[0]}</strong>. Você poderá revisá-lo e enviar diretamente para nossa equipe!` }
+    ],
+    final: true
+  }
+];
+
+let multiSelected = [];
+
+function startChat() {
+  chatStarted = true;
+  stepIdx = 0;
+  runStep(0);
+}
+
+function runStep(idx) {
+  const step = flow[idx];
+  if (!step) return;
+
+  // Lógica inteligente: se a etapa tem condição e ela for falsa, pula para a próxima!
+  if (step.condition && !step.condition()) {
+    stepIdx++;
+    runStep(stepIdx);
+    return;
+  }
+
+  awaitingInput = null;
+  clearOptions();
+
+  let delay = 0;
+  step.messages.forEach((msg, i) => {
+    setTimeout(() => {
+      if (i < step.messages.length - 1) showTyping();
+    }, delay);
+    delay += msg.delay || 800;
+    setTimeout(() => {
+      hideTyping();
+      const text = typeof msg.text === 'function' ? msg.text(userData) : msg.text;
+      addAiMsg(text);
+      if (i === step.messages.length - 1) {
+        setTimeout(() => {
+          if (step.final) {
+            showSummary();
+            return;
+          }
+          if (step.options && step.options.length > 0) {
+            multiSelected = [];
+            setOptions(step.options, (val) => {
+              if (step.onOption) step.onOption(val);
+              updateSidebar(stepIdx);
+              stepIdx++;
+              setTimeout(() => runStep(stepIdx), 1500);
+            }, step.multiSelect);
+          }
+          if (step.input) {
+            enableInput(step.inputPlaceholder || 'Digite aqui...');
+            awaitingInput = step;
+          }
+        }, 400);
+      }
+    }, delay);
+    delay += 600;
+  });
+}
+
+function addAiMsg(html) {
+  const msgs = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'msg ai';
+  div.innerHTML = `
+    <div class="msg-avatar">N</div>
+    <div class="msg-bubble">${html}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function addUserMsg(text) {
+  const msgs = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'msg user';
+  div.innerHTML = `
+    <div class="msg-bubble">${text}</div>
+    <div class="msg-avatar" style="background:var(--green);color:white;">U</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+let typingEl = null;
+function showTyping() {
+  if (typingEl) return;
+  const msgs = document.getElementById('chat-messages');
+  typingEl = document.createElement('div');
+  typingEl.className = 'msg ai';
+  typingEl.innerHTML = `<div class="msg-avatar">N</div><div class="msg-bubble"><div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;
+  msgs.appendChild(typingEl);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+function hideTyping() {
+  if (typingEl) { typingEl.remove(); typingEl = null; }
+}
+
+function setOptions(opts, callback, multi = false) {
+  const grid = document.getElementById('options-grid');
+  grid.innerHTML = '';
+  multiSelected = [];
+
+  opts.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.textContent = opt;
+    btn.onclick = () => {
+      if (multi) {
+        btn.classList.toggle('selected');
+        if (btn.classList.contains('selected')) multiSelected.push(opt);
+        else multiSelected = multiSelected.filter(v => v !== opt);
+        
+        if (!document.getElementById('confirm-multi')) {
+          const conf = document.createElement('button');
+          conf.id = 'confirm-multi';
+          conf.className = 'btn-primary';
+          conf.style = 'margin-top:8px;padding:10px 20px;font-size:0.82rem;';
+          conf.textContent = 'Confirmar seleção →';
+          conf.onclick = () => {
+            const val = multiSelected.join(', ') || opts[opts.length-1];
+            addUserMsg(val);
+            clearOptions(); 
+            callback(val);
+          };
+          grid.appendChild(conf);
+        }
+      } else {
+        addUserMsg(opt);
+        clearOptions(); 
+        callback(opt);
+      }
+    };
+    grid.appendChild(btn);
+  });
+}
+
+function clearOptions() {
+  document.getElementById('options-grid').innerHTML = '';
+}
+
+function enableInput(placeholder) {
+  const inp = document.getElementById('chat-input');
+  inp.placeholder = placeholder;
+  inp.focus();
+}
+
+function sendUserMsg() {
+  const inp = document.getElementById('chat-input');
+  const val = inp.value.trim();
+  if (!val) return;
+  inp.value = '';
+  if (awaitingInput) {
+    addUserMsg(val);
+    awaitingInput.onInput(val);
+    updateSidebar(stepIdx);
+    awaitingInput = null;
+    stepIdx++;
+    setTimeout(() => runStep(stepIdx), 600);
+  }
+}
+
+document.getElementById('chat-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendUserMsg(); }
+});
+
+function updateSidebar(idx) {
+  const pct = Math.min(Math.round(((idx + 1) / flow.length) * 100), 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = pct + '%';
+
+  // Atualizando o mapa para refletir o novo tamanho do array do fluxo
+  const stepMap = {
+    0:0, 1:0,               // 1. Identificação
+    2:1, 3:1,               // 2. Localização
+    4:2,                    // 3. Ambiente
+    5:3, 6:3,               // 4. Estilo
+    7:4, 8:4, 9:4, 10:4, 11:4, 12:4, // 5. Medidas (incluindo as condicionais)
+    13:5, 14:5              // 6. Resumo
+  };
+  
+  const sidebarStep = stepMap[idx] ?? 0;
+  document.querySelectorAll('.step-item').forEach((el, i) => {
+    el.classList.remove('active','done');
+    if (i < sidebarStep) el.classList.add('done');
+    else if (i === sidebarStep) el.classList.add('active');
+  });
+}
+
+function showSummary() {
+  document.getElementById('sum-nome').textContent = userData.nome || '—';
+  document.getElementById('sum-tel').textContent = userData.tel || '—';
+  document.getElementById('sum-end').textContent = userData.end || '—';
+  document.getElementById('sum-tipo').textContent = userData.tipo || '—';
+  document.getElementById('sum-visita').textContent = userData.visita || '—';
+  document.getElementById('sum-ambiente').textContent = userData.ambiente || '—';
+  document.getElementById('sum-cor').textContent = userData.cor || '—';
+  document.getElementById('sum-estilo').textContent = userData.estilo || '—';
+  document.getElementById('sum-geladeira').textContent = userData.geladeira || '—';
+  document.getElementById('sum-fogao').textContent = userData.fogao || '—';
+  document.getElementById('sum-outros').textContent = userData.outros || '—';
+
+  // Exibe os equipamentos dinâmicos no resumo apenas se foram preenchidos
+  if(userData.microondas) {
+      document.getElementById('row-microondas').style.display = 'flex';
+      document.getElementById('sum-microondas').textContent = userData.microondas;
+  }
+  if(userData.coifa) {
+      document.getElementById('row-coifa').style.display = 'flex';
+      document.getElementById('sum-coifa').textContent = userData.coifa;
+  }
+  if(userData.maquina) {
+      document.getElementById('row-maquina').style.display = 'flex';
+      document.getElementById('sum-maquina').textContent = userData.maquina;
+  }
+
+  setTimeout(() => {
+    document.getElementById('summary-overlay').classList.remove('hidden');
+  }, 1500);
+}
+
+function sendToWhatsApp() {
+  // LÓGICA CONCEITUAL TIPO GOOGLE FORMS:
+  /*
+  fetch('SUA_URL_DO_WEBHOOK_AQUI', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(userData)
+  }).then(response => console.log('Dados enviados pro Sheets com sucesso!'));
+  */
+
+  // Formatando o texto dinamicamente para o WhatsApp
+  let equipText = `*Geladeira:* ${userData.geladeira}\n*Fogão/Cooktop:* ${userData.fogao}\n`;
+  if (userData.microondas) equipText += `*Microondas:* ${userData.microondas}\n`;
+  if (userData.coifa) equipText += `*Coifa/Depurador:* ${userData.coifa}\n`;
+  if (userData.maquina) equipText += `*Máquina de Lavar:* ${userData.maquina}\n`;
+  if (!userData.microondas && !userData.coifa && !userData.maquina) equipText += `*Outros Itens:* ${userData.outros}\n`;
+
+  const msg = encodeURIComponent(
+    `*Novo pedido de orçamento — Novaes Planejados* 🌿\n\n` +
+    `*Nome:* ${userData.nome}\n*Telefone:* ${userData.tel}\n*Endereço:* ${userData.end}\n*Imóvel:* ${userData.tipo}\n*Visita:* ${userData.visita}\n\n` +
+    `*Ambiente:* ${userData.ambiente}\n*Cor:* ${userData.cor}\n*Estilo:* ${userData.estilo}\n\n` +
+    equipText + `\n` +
+    `_Pedido gerado pelo site Novaes Planejados_`
+  );
+  window.open(`https://wa.me/5521980859778?text=${msg}`, '_blank');
+}
+</script>
+</body>
+</html>
