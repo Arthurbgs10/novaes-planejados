@@ -450,20 +450,29 @@
   .opt-btn:hover { background: var(--green); color: white; border-color: var(--green); }
   .opt-btn.selected { background: var(--green-dark); color: white; border-color: var(--green-dark); }
 
-  .input-row {
+ .input-row {
     display: flex; gap: 10px; align-items: flex-end;
   }
-  .chat-input {
-    flex: 1; border: 1.5px solid rgba(122,158,126,0.3);
-    border-radius: 12px; padding: 11px 16px;
-    font-family: 'DM Sans', sans-serif; font-size: 0.88rem;
-    background: var(--cream); color: var(--text);
-    resize: none; outline: none; transition: border-color 0.2s;
-    min-height: 44px; max-height: 100px;
+  .chat-input { 
+    flex: 1; 
+    border: 1.5px solid rgba(122,158,126,0.3); 
+    border-radius: 12px; 
+    padding: 11px 16px; 
+    font-family: 'DM Sans', sans-serif; 
+    font-size: 16px !important; /* ← ESSENCIAL PARA O IOS NÃO DAR ZOOM */
+    background: var(--cream); 
+    color: var(--text); 
+    resize: none; 
+    outline: none; 
+    transition: border-color 0.2s; 
+    min-height: 44px; 
+    max-height: 100px; 
   }
   
   .chat-input:focus { border-color: var(--green); }
+  
   .chat-input::placeholder { color: var(--text-muted); }
+  
   .send-btn-chat {
     width: 44px; height: 44px; border-radius: 12px;
     background: var(--green-dark); border: none; cursor: pointer;
