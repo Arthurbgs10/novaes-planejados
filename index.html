@@ -691,7 +691,7 @@
       </div>
       <div class="portfolio-item" data-cat="cozinha" style="height:220px; border-radius:var(--radius);">
         <img src="assets/image_6ed119.jpg" alt="Cozinha Executada" />
-        <div class="portfolio-overlay"><span class="portfolio-label">Execução perfeita do 3D para a reality</span></div>
+        <div class="portfolio-overlay"><span class="portfolio-label">Execução perfeita do 3D para a realidade</span></div>
       </div>
     </div>
 
@@ -931,13 +931,12 @@ function filterPortfolio(cat, btn) {
 let chatStarted = false;
 let apiKey = "";
 let chatHistory = []; 
-let currentIaStep = 0; // ← Nova variável para controlar a barra lateral sem depender do array 'flow'
+let currentIaStep = 0; 
 
 let userData = { nome: '—', tel: '—', end: '—', tipo: '—', visita: '—', ambiente: '—', cor: '—', estilo: '—', geladeira: '—', fogao: '—', outros: '—', microondas: '', coifa: '', maquina: '' };
 let awaitingInput = null;
 let multiSelected = [];
 
-// Instrução atualizada para o Erro 3: Força a IA a gerar os dados estruturados no fechamento
 const SYSTEM_INSTRUCTION = `Você é a Nina, assistente virtual calorosa, prestativa e profissional da Novaes Planejados (empresa de móveis sob medida em Campo Grande, RJ, dos fundadores Marcela e Carlos Daniel). 
 Seu objetivo é guiar o cliente para entender o projeto dos sonhos dele e coletar estas informações essenciais:
 1. Nome completo
@@ -969,15 +968,14 @@ function startChat() {
   }
 
   chatStarted = true;
-  chatHistory = [];
+  chatHistory = []; // Começa vazio para cumprir a regra da API de iniciar obrigatoriamente com o usuário
   currentIaStep = 0;
-  updateSidebar(0); // Inicia a barra lateral no passo 1
+  updateSidebar(0); 
   document.getElementById('chat-messages').innerHTML = '';
   
-  const saudacao = "Olá! 🌿 Sou a Nina, assistente virtual da Novaes Planejados. Estou aqui para entender o seu dream e montar o seu orçamento sob medida. Para começarmos, qual é o seu nome completo?";
+  const saudacao = "Olá! 🌿 Sou a Nina, assistente virtual da Novaes Planejados. Estou aqui para entender o seu sonho e montar o seu orçamento sob medida. Para começarmos, qual é o seu nome completo?";
   addAiMsg(saudacao);
   
-  chatHistory.push({ role: "model", parts: [{ text: saudacao }] });
   enableInput("Digite seu nome...");
 }
 
@@ -987,7 +985,6 @@ async function perguntarAoGemini(mensagemUsuario) {
   
   chatHistory.push({ role: "user", parts: [{ text: mensagemUsuario }] });
 
-  // Faz a barra lateral avançar visualmente a cada mensagem do cliente
   if (currentIaStep < 4) {
     currentIaStep++;
     updateSidebar(currentIaStep);
@@ -1007,8 +1004,8 @@ async function perguntarAoGemini(mensagemUsuario) {
 
     if (data.candidates && data.candidates[0].content.parts[0].text) {
       let respostaIA = data.candidates[0].content.parts[0].text;
+      chatHistory.push({ role: "model", parts: [{ text: respostaIA }] });
 
-      // GATILHO DE FECHAMENTO (CORREÇÃO DO ERRO 3): Captura o JSON da IA
       if (respostaIA.includes("[CONCLUIDO]")) {
         let partes = respostaIA.split("[CONCLUIDO]");
         let textoFinal = partes[0].trim();
@@ -1018,20 +1015,18 @@ async function perguntarAoGemini(mensagemUsuario) {
         else addAiMsg("Perfeito! Montei o painel com o resumo das especificações do seu projeto.");
 
         try {
-          // Converte o texto da IA em dados reais e updates o resumo
           let dadosExtraidos = JSON.parse(jsonTexto);
           Object.assign(userData, dadosExtraidos);
         } catch (e) {
           console.error("Erro ao processar dados da IA:", e);
-          userData.nome = chatHistory[1]?.parts[0].text || "Cliente Novaes";
+          userData.nome = chatHistory[0]?.parts[0].text || "Cliente Novaes";
         }
 
-        updateSidebar(5); // Conclui os passos da barra lateral (100%)
+        updateSidebar(5); 
         setTimeout(() => { showSummary(); }, 2000);
         return;
       }
 
-      // GATILHO DOS BOTÕES
       if (respostaIA.includes("[OPCOES:")) {
         let partes = respostaIA.split("[OPCOES:");
         let textoLimpo = partes[0].trim();
@@ -1039,7 +1034,6 @@ async function perguntarAoGemini(mensagemUsuario) {
         let listaOpcoes = opcoesTexto.split(",").map(o => o.trim());
 
         addAiMsg(textoLimpo);
-        chatHistory.push({ role: "model", parts: [{ text: respostaIA }] });
 
         setOptions(listaOpcoes, (opcaoEscolhida) => {
           perguntarAoGemini(opcaoEscolhida);
@@ -1047,16 +1041,18 @@ async function perguntarAoGemini(mensagemUsuario) {
         return;
       }
 
-      // Conversa por texto normal
       addAiMsg(respostaIA);
-      chatHistory.push({ role: "model", parts: [{ text: respostaIA }] });
       enableInput("Digite sua resposta...");
+    } else {
+      addAiMsg("Houve um problema de comunicação com os servidores da API. Verifique o console.");
+      console.error("Erro da API Gemini:", data);
     }
   } catch (error) {
     hideTyping();
     addAiMsg("Houve um erro ao conectar com a Nina. Verifique sua conexão ou API Key.");
   }
 }
+
 // ---- FUNÇÕES VISUAIS INTEGRADAS ----
 function addAiMsg(html) {
   const msgs = document.getElementById('chat-messages');
@@ -1121,9 +1117,7 @@ function sendUserMsg() {
   perguntarAoGemini(val);
 }
 
-// ---- CONTROLES DE EVENTO E INTERFACE DA IA ----
-
-// Escuta o teclado para enviar a mensagem ao apertar Enter
+// ---- CONTROLES DE EVENTO ----
 document.getElementById('chat-input').addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && !e.shiftKey) { 
     e.preventDefault(); 
@@ -1131,7 +1125,6 @@ document.getElementById('chat-input').addEventListener('keydown', (e) => {
   }
 });
 
-// Atualiza a barra de progresso e os passos laterais dinamicamente
 function updateSidebar(stepNumber) {
   const totalSteps = 6;
   const pct = Math.min(Math.round(((stepNumber + 1) / totalSteps) * 100), 100);
@@ -1162,7 +1155,6 @@ function showSummary() {
   document.getElementById('sum-fogao').textContent = userData.fogao || '—';
   document.getElementById('sum-outros').textContent = userData.outros || '—';
 
-  // Exibe os equipamentos dinâmicos no resumo apenas se foram preenchidos
   if(userData.microondas) {
       document.getElementById('row-microondas').style.display = 'flex';
       document.getElementById('sum-microondas').textContent = userData.microondas;
@@ -1182,16 +1174,6 @@ function showSummary() {
 }
 
 function sendToWhatsApp() {
-  // LÓGICA CONCEITUAL TIPO GOOGLE FORMS:
-  /*
-  fetch('SUA_URL_DO_WEBHOOK_AQUI', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(userData)
-  }).then(response => console.log('Dados enviados pro Sheets com sucesso!'));
-  */
-
-  // Formatando o texto dinamicamente para o WhatsApp
   let equipText = `*Geladeira:* ${userData.geladeira}\n*Fogão/Cooktop:* ${userData.fogao}\n`;
   if (userData.microondas) equipText += `*Microondas:* ${userData.microondas}\n`;
   if (userData.coifa) equipText += `*Coifa/Depurador:* ${userData.coifa}\n`;
