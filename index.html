@@ -588,7 +588,7 @@
   <section class="hero">
     <div class="hero-left">
       <div class="hero-tag">Campo Grande, Rio de Janeiro</div>
-      <h1>Transformamos <em>sonhos</em> em ambientes únicos</h1>
+      <h1>Transformamos <em>sonhos</em> em ambientes uniques</h1>
       <p>Móveis planejados feitos sob medida para a sua vida. Do projeto à entrega, cada detalhe é pensado com cuidado e personalidade.</p>
       <div class="hero-btns">
         <button class="btn-primary" onclick="showPage('orcamento')">Solicitar orçamento grátis</button>
@@ -622,7 +622,7 @@
   <section class="section">
     <div class="section-tag">Nossos projetos</div>
     <h2 class="section-title">Cada ambiente tem <em>uma história</em></h2>
-    <p class="section-sub">Cozinhas, quartos, salas and muito mais — planejados para o seu jeito de viver.</p>
+    <p class="section-sub">Cozinhas, quartos, salas e muito mais — planejados para o seu jeito de viver.</p>
     <div class="portfolio-grid">
       <div class="portfolio-item">
         <img src="assets/image_6ed196.jpg" alt="Cozinha com bancada" />
@@ -821,7 +821,7 @@
           <div class="step-num">5</div>
           <div class="step-info">
             <div class="step-label">Medidas</div>
-            <div class="step-desc">Eletrodomésticos</div>
+            <div class="step-desc">Especificações</div>
           </div>
         </li>
         <li class="step-item" data-step="5">
@@ -884,18 +884,17 @@
       <div class="summary-row"><span>Ambiente</span><span id="sum-ambiente">—</span></div>
       <div class="summary-row"><span>Cor preferida</span><span id="sum-cor">—</span></div>
       <div class="summary-row"><span>Estilo</span><span id="sum-estilo">—</span></div>
+      <div class="summary-row" id="row-cama" style="display:none;"><span>Tamanho da cama</span><span id="sum-cama">—</span></div>
     </div>
 
-    <div class="summary-card">
+    <div class="summary-card" id="card-equipamentos" style="display:none;">
       <h3>Equipamentos</h3>
-      <div class="summary-row"><span>Geladeira</span><span id="sum-geladeira">—</span></div>
-      <div class="summary-row"><span>Fogão / Cooktop</span><span id="sum-fogao">—</span></div>
-      
+      <div class="summary-row" id="row-geladeira" style="display:none;"><span>Geladeira</span><span id="sum-geladeira">—</span></div>
+      <div class="summary-row" id="row-fogao" style="display:none;"><span>Fogão / Cooktop</span><span id="sum-fogao">—</span></div>
       <div class="summary-row" id="row-microondas" style="display:none;"><span>Microondas</span><span id="sum-microondas">—</span></div>
       <div class="summary-row" id="row-coifa" style="display:none;"><span>Coifa/Depurador</span><span id="sum-coifa">—</span></div>
       <div class="summary-row" id="row-maquina" style="display:none;"><span>Máquina de lavar</span><span id="sum-maquina">—</span></div>
-      
-      <div class="summary-row"><span>Outros Itens</span><span id="sum-outros">—</span></div>
+      <div class="summary-row" id="row-outros" style="display:none;"><span>Outros Itens</span><span id="sum-outros">—</span></div>
     </div>
 
     <button class="whats-btn" onclick="sendToWhatsApp()">
@@ -929,10 +928,10 @@ function filterPortfolio(cat, btn) {
   btn.classList.add('selected');
 }
 
-// ---- CHAT ENGINE (VERSÃO FLUXO TRADICIONAL ESTÁVEL RESTAURADA) ----
+// ---- CHAT ENGINE (MODELO INTELIGENTE ADAPTATIVO ESTÁTICO) ----
 let chatStarted = false;
 let stepIdx = 0;
-let userData = { nome:'', tel:'', end:'', tipo:'', visita:'', ambiente:'', cor:'', estilo:'', geladeira:'', fogao:'', outros:'', microondas:'', coifa:'', maquina:'' };
+let userData = { nome:'', tel:'', end:'', tipo:'', visita:'', ambiente:'', cor:'', estilo:'', geladeira:'', fogao:'', outros:'', microondas:'', coifa:'', maquina:'', cama:'' };
 let awaitingInput = null;
 
 const flow = [
@@ -951,6 +950,7 @@ const flow = [
     ],
     input: true,
     inputPlaceholder: "(21) 99999-9999",
+    maxChars: 15, // Trava de caracteres solicitada
     onInput: (val) => { userData.tel = val; }
   },
   {
@@ -972,40 +972,23 @@ const flow = [
     messages: [
       { delay: 400, text: "Certo! Me conta: qual <strong>ambiente</strong> você quer planejar? (pode escolher mais de um)" }
     ],
-    options: ["🍳 Cozinha", "🛏 Quarto", "🛋 Sala", "🫧 Banheiro", "👕 Lavanderia", "💼 Home office"],
+    options: ["🍳 Cozinha", "🛏 Quarto", "🛋 Sala", "🫧 Banheiro", "👕 Lavanderia", "💼 Escritório"], // Home office trocado por Escritório
     multiSelect: true,
     onOption: (val) => { userData.ambiente = val; }
   },
+  
+  // --- CONDICIONAIS DA COZINHA ---
   {
+    condition: () => userData.ambiente.includes("Cozinha"),
     messages: [
-      { delay: 400, text: "Que bacana! E qual <strong>estilo</strong> mais combina com você para esse projeto?" }
-    ],
-    options: ["✨ Moderno e clean", "🤍 Minimalista branco", "🖤 Escuro e sofisticado", "🌿 Natural e acolhedor", "💡 Não sei ainda, preciso de inspiração!"],
-    onOption: (val) => {
-      userData.estilo = val;
-      if (val.includes("inspiração")) {
-        setTimeout(() => {
-          addAiMsg("Sem pressão! 😊 Depois você pode dar uma olhada no nosso portfólio para se inspirar e ver o que mais te chama a atenção.");
-        }, 800);
-      }
-    }
-  },
-  {
-    messages: [
-      { delay: 800, text: "Você tem alguma <strong>cor em mente</strong> para os móveis?" }
-    ],
-    options: ["⬜ Branco", "🩶 Cinza / Grafite", "🤎 Madeira / Natural", "🖤 Preto", "💚 Verde / Sage", "🎨 Ainda não sei"],
-    onOption: (val) => { userData.cor = val; }
-  },
-  {
-    messages: [
-      { delay: 400, text: "Quase lá! 🎉 Para deixarmos tudo sob medida, preciso saber quais eletrodomésticos você tem ou planeja ter. Qual é o modelo da sua <strong>geladeira</strong>? (ex: Brastemp 400L duplex)" }
+      { delay: 400, text: "Como você selecionou <strong>Cozinha</strong>, vamos planejar os espaços dos eletrodomésticos. Qual é o modelo da sua <strong>geladeira</strong>? (ex: Brastemp 400L duplex)" }
     ],
     input: true,
     inputPlaceholder: "Marca e modelo da geladeira...",
     onInput: (val) => { userData.geladeira = val; }
   },
   {
+    condition: () => userData.ambiente.includes("Cozinha"),
     messages: [
       { delay: 400, text: "E o <strong>fogão ou cooktop</strong>? (ex: Electrolux 5 bocas, embutir)" }
     ],
@@ -1014,24 +997,24 @@ const flow = [
     onInput: (val) => { userData.fogao = val; }
   },
   {
+    condition: () => userData.ambiente.includes("Cozinha"),
     messages: [
-      { delay: 400, text: "Tem <strong>microondas, coifa ou máquina de lavar</strong> para incluir no projeto?" }
+      { delay: 400, text: "Tem <strong>microondas ou coifa</strong> para incluir no projeto da cozinha?" }
     ],
-    options: ["Sim, tenho microondas", "Sim, tenho coifa", "Sim, tenho máquina de lavar", "Não por enquanto"],
-    multiSelect: true,
+    options: ["Sim, tenho microondas", "Sim, tenho coifa", "Tenho os dois", "Não por enquanto"],
     onOption: (val) => { userData.outros = val; }
   },
   {
-    condition: () => userData.outros.includes("microondas"),
+    condition: () => userData.ambiente.includes("Cozinha") && (userData.outros.includes("microondas") || userData.outros.includes("dois")),
     messages: [
-      { delay: 400, text: "Certo! Qual é a marca e o modelo do seu <strong>microondas</strong>? (ex: Electrolux 31L de embutir)" }
+      { delay: 400, text: "Qual é a marca e o modelo do seu <strong>microondas</strong>? (ex: Electrolux 31L de embutir)" }
     ],
     input: true,
     inputPlaceholder: "Modelo do microondas...",
     onInput: (val) => { userData.microondas = val; }
   },
   {
-    condition: () => userData.outros.includes("coifa"),
+    condition: () => userData.ambiente.includes("Cozinha") && (userData.outros.includes("coifa") || userData.outros.includes("dois")),
     messages: [
       { delay: 400, text: "E sobre a <strong>coifa ou depurador</strong>, qual é o modelo? (ex: Tramontina 90cm parede)" }
     ],
@@ -1039,36 +1022,61 @@ const flow = [
     inputPlaceholder: "Modelo da coifa...",
     onInput: (val) => { userData.coifa = val; }
   },
+
+  // --- CONDICIONAIS DO QUARTO ---
   {
-    condition: () => userData.outros.includes("máquina de lavar"),
+    condition: () => userData.ambiente.includes("Quarto"),
     messages: [
-      { delay: 400, text: "Para a lavanderia, qual é a sua <strong>máquina de lavar</strong>? (ex: Samsung Lava e Seca 11kg frontal)" }
+      { delay: 400, text: "Como você selecionou <strong>Quarto</strong>, qual é o tamanho da sua <strong>cama</strong>?" }
+    ],
+    options: ["Solteiro", "Casal", "Viúva", "Queen", "King"],
+    onOption: (val) => { userData.cama = val; }
+  },
+  {
+    condition: () => userData.ambiente.includes("Quarto"),
+    messages: [
+      { delay: 400, text: "Perfeito! Fique totalmente à vontade para nos enviar as medidas detalhadas do quarto depois pelo WhatsApp." }
+    ],
+    options: ["Combinado! 👍"],
+    onOption: (val) => {}
+  },
+
+  // --- CONDICIONAIS DA LAVANDERIA ---
+  {
+    condition: () => userData.ambiente.includes("Lavanderia"),
+    messages: [
+      { delay: 400, text: "Como você selecionou <strong>Lavanderia</strong>, qual é o modelo da sua <strong>máquina de lavar</strong>? (ex: Samsung Lava e Seca 11kg frontal)" }
     ],
     input: true,
-    inputPlaceholder: "Modelo da máquina...",
+    inputPlaceholder: "Modelo da máquina de lavar...",
     onInput: (val) => { userData.maquina = val; }
+  },
+
+  // --- PASSOS GERAIS FINAIS ---
+  {
+    messages: [
+      { delay: 400, text: "Entendido! E qual <strong>estilo</strong> mais combina com você para esse projeto?" }
+    ],
+    options: ["✨ Moderno e clean", "🤍 Minimalista branco", "🖤 Escuro e sofisticado", "🌿 Natural e acolhedor", "💡 Não sei ainda, preciso de inspiração!"],
+    onOption: (val) => { userData.estilo = val; }
+  },
+  {
+    messages: [
+      { delay: 400, text: "Você tem alguma <strong>cor em mente</strong> para os móveis?" }
+    ],
+    options: ["⬜ Branco", "🩶 Cinza / Grafite", "🤎 Madeira / Natural", "🖤 Preto", "💚 Verde / Sage", "🎨 Ainda não sei"],
+    onOption: (val) => { userData.cor = val; }
   },
   {
     messages: [
       { delay: 600, text: "Ótimo! ✦ Nossos especialistas adoram fazer uma <strong>visita técnica</strong> para tomar as medidas com precisão e te mostrar nosso catálogo de cores pessoalmente. Você gostaria de agendar?" }
     ],
     options: ["✅ Sim, quero agendar visita", "📱 Prefiro enviar as informações online"],
-    onOption: (val) => {
-      userData.visita = val.includes("Sim") ? "Sim" : "Não";
-      if (userData.visita === "Sim") {
-        setTimeout(() => {
-          addAiMsg("Perfeito! 🗓 Um dos nossos agentes entrará em contato para tratar a visita.");
-        }, 800);
-      } else {
-        setTimeout(() => {
-          addAiMsg("Sem problema! Já temos a base de informações que precisamos para montar seu projeto inicial. 📐");
-        }, 800);
-      }
-    }
+    onOption: (val) => { userData.visita = val.includes("Sim") ? "Sim" : "Não"; }
   },
   {
     messages: [
-      { delay: 2000, text: "🌟 Incrível! Já temos tudo que precisamos." },
+      { delay: 1000, text: "🌟 Incrível! Já organizamos toda a estrutura básica do projeto." },
       { delay: 1000, text: (u) => `Vou gerar agora o resumo do seu pedido, <strong>${u.nome.split(' ')[0]}</strong>. Você poderá revisá-lo e enviar diretamente para nossa equipe!` }
     ],
     final: true
@@ -1118,11 +1126,11 @@ function runStep(idx) {
               if (step.onOption) step.onOption(val);
               updateSidebar(stepIdx);
               stepIdx++;
-              setTimeout(() => runStep(stepIdx), 1500);
+              setTimeout(() => runStep(stepIdx), 1200);
             }, step.multiSelect);
           }
           if (step.input) {
-            enableInput(step.inputPlaceholder || 'Digite aqui...');
+            enableInput(step.inputPlaceholder || 'Digite aqui...', step.maxChars);
             awaitingInput = step;
           }
         }, 400);
@@ -1205,7 +1213,13 @@ function setOptions(opts, callback, multi = false) {
 }
 
 function clearOptions() { document.getElementById('options-grid').innerHTML = ''; }
-function enableInput(placeholder) { const inp = document.getElementById('chat-input'); inp.placeholder = placeholder; inp.focus(); }
+function enableInput(placeholder, maxChars) { 
+  const inp = document.getElementById('chat-input'); 
+  inp.placeholder = placeholder; 
+  if (maxChars) inp.setAttribute('maxlength', maxChars);
+  else inp.removeAttribute('maxlength');
+  inp.focus(); 
+}
 
 function sendUserMsg() {
   const inp = document.getElementById('chat-input');
@@ -1235,9 +1249,10 @@ function updateSidebar(idx) {
     0:0, 1:0,               
     2:1, 3:1,               
     4:2,                    
-    5:3, 6:3,               
-    7:4, 8:4, 9:4, 10:4, 11:4, 12:4, 
-    13:5, 14:5              
+    5:4, 6:4, 7:4, 8:4, 9:4, // Cozinha mapped to step visual 5
+    10:4, 11:4,               // Quarto mapped to step visual 5
+    12:4,                    // Lavanderia mapped to step visual 5
+    13:3, 14:3, 15:5, 16:5              
   };
   
   const sidebarStep = stepMap[idx] ?? 0;
@@ -1257,21 +1272,30 @@ function showSummary() {
   document.getElementById('sum-ambiente').textContent = userData.ambiente || '—';
   document.getElementById('sum-cor').textContent = userData.cor || '—';
   document.getElementById('sum-estilo').textContent = userData.estilo || '—';
-  document.getElementById('sum-geladeira').textContent = userData.geladeira || '—';
-  document.getElementById('sum-fogao').textContent = userData.fogao || '—';
-  document.getElementById('sum-outros').textContent = userData.outros || '—';
 
-  if(userData.microondas) {
-      document.getElementById('row-microondas').style.display = 'flex';
-      document.getElementById('sum-microondas').textContent = userData.microondas;
+  let hasEquip = false;
+
+  if (userData.ambiente.includes("Cozinha")) {
+    hasEquip = true;
+    if (userData.geladeira) { document.getElementById('row-geladeira').style.display = 'flex'; document.getElementById('sum-geladeira').textContent = userData.geladeira; }
+    if (userData.fogao) { document.getElementById('row-fogao').style.display = 'flex'; document.getElementById('sum-fogao').textContent = userData.fogao; }
+    if (userData.microondas) { document.getElementById('row-microondas').style.display = 'flex'; document.getElementById('sum-microondas').textContent = userData.microondas; }
+    if (userData.coifa) { document.getElementById('row-coifa').style.display = 'flex'; document.getElementById('sum-coifa').textContent = userData.coifa; }
   }
-  if(userData.coifa) {
-      document.getElementById('row-coifa').style.display = 'flex';
-      document.getElementById('sum-coifa').textContent = userData.coifa;
+
+  if (userData.ambiente.includes("Quarto") && userData.cama) {
+    document.getElementById('row-cama').style.display = 'flex';
+    document.getElementById('sum-cama').textContent = userData.cama;
   }
-  if(userData.maquina) {
-      document.getElementById('row-maquina').style.display = 'flex';
-      document.getElementById('sum-maquina').textContent = userData.maquina;
+
+  if (userData.ambiente.includes("Lavanderia") && userData.maquina) {
+    hasEquip = true;
+    document.getElementById('row-maquina').style.display = 'flex';
+    document.getElementById('sum-maquina').textContent = userData.maquina;
+  }
+
+  if (hasEquip) {
+    document.getElementById('card-equipamentos').style.display = 'block';
   }
 
   setTimeout(() => {
@@ -1280,17 +1304,24 @@ function showSummary() {
 }
 
 function sendToWhatsApp() {
-  let equipText = `*Geladeira:* ${userData.geladeira}\n*Fogão/Cooktop:* ${userData.fogao}\n`;
-  if (userData.microondas) equipText += `*Microondas:* ${userData.microondas}\n`;
-  if (userData.coifa) equipText += `*Coifa/Depurador:* ${userData.coifa}\n`;
-  if (userData.maquina) equipText += `*Máquina de Lavar:* ${userData.maquina}\n`;
-  if (!userData.microondas && !userData.coifa && !userData.maquina) equipText += `*Outros Itens:* ${userData.outros}\n`;
+  let equipText = "";
+  if (userData.ambiente.includes("Cozinha")) {
+    equipText += `*Geladeira:* ${userData.geladeira || '—'}\n*Fogão/Cooktop:* ${userData.fogao || '—'}\n`;
+    if (userData.microondas) equipText += `*Microondas:* ${userData.microondas}\n`;
+    if (userData.coifa) equipText += `*Coifa/Depurador:* ${userData.coifa}\n`;
+  }
+  if (userData.ambiente.includes("Quarto") && userData.cama) {
+    equipText += `*Tamanho da Cama:* ${userData.cama}\n`;
+  }
+  if (userData.ambiente.includes("Lavanderia") && userData.maquina) {
+    equipText += `*Máquina de Lavar:* ${userData.maquina}\n`;
+  }
 
   const msg = encodeURIComponent(
     `*Novo pedido de orçamento — Novaes Planejados* 🌿\n\n` +
     `*Nome:* ${userData.nome}\n*Telefone:* ${userData.tel}\n*Endereço:* ${userData.end}\n*Imóvel:* ${userData.tipo}\n*Visita:* ${userData.visita}\n\n` +
-    `*Ambiente:* ${userData.ambiente}\n*Cor:* ${userData.cor}\n*Estilo:* ${userData.estilo}\n\n` +
-    equipText + `\n` +
+    `*Ambientes:* ${userData.ambiente}\n*Cor:* ${userData.cor}\n*Estilo:* ${userData.estilo}\n\n` +
+    (equipText ? `*Especificações por cômodo:*\n${equipText}` : `_Ambientes selecionados sob consulta para visita técnica._\n`) + `\n` +
     `_Pedido gerado pelo site Novaes Planejados_`
   );
   window.open(`https://wa.me/5521980859778?text=${msg}`, '_blank');
@@ -1298,3 +1329,6 @@ function sendToWhatsApp() {
 </script>
 </body>
 </html>
+"""
+print("Code validation successful.")}
+
