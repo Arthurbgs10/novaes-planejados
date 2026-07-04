@@ -1005,8 +1005,11 @@ async function perguntarAoGemini(mensagemUsuario) {
 
     if (data.candidates && data.candidates[0].content.parts[0].text) {
       let respostaIA = data.candidates[0].content.parts[0].text;
+      
+      // ⚡ CORREÇÃO: Salva no histórico APENAS UMA VEZ aqui no topo para toda a função
       chatHistory.push({ role: "model", parts: [{ text: respostaIA }] });
 
+      // GATILHO DE FECHAMENTO
       if (respostaIA.includes("[CONCLUIDO]")) {
         let partes = respostaIA.split("[CONCLUIDO]");
         let textoFinal = partes[0].trim();
@@ -1028,6 +1031,7 @@ async function perguntarAoGemini(mensagemUsuario) {
         return;
       }
 
+      // GATILHO DOS BOTÕES (Removido o push duplicado que estava aqui)
       if (respostaIA.includes("[OPCOES:")) {
         let partes = respostaIA.split("[OPCOES:");
         let textoLimpo = partes[0].trim();
@@ -1042,6 +1046,7 @@ async function perguntarAoGemini(mensagemUsuario) {
         return;
       }
 
+      // Conversa por texto normal (Removido o push duplicado que estava aqui)
       addAiMsg(respostaIA);
       enableInput("Digite sua resposta...");
     } else {
