@@ -930,31 +930,35 @@ function filterPortfolio(cat, btn) {
 }
 let chatStarted = false;
 let apiKey = "";
-let chatHistory = []; // Armazena a conversa para a IA ter memória
+let chatHistory = []; 
+let currentIaStep = 0; // ← Nova variável para controlar a barra lateral sem depender do array 'flow'
 
 let userData = { nome: '—', tel: '—', end: '—', tipo: '—', visita: '—', ambiente: '—', cor: '—', estilo: '—', geladeira: '—', fogao: '—', outros: '—', microondas: '', coifa: '', maquina: '' };
 let awaitingInput = null;
 let multiSelected = [];
 
-// Ensinamos a IA a usar a tag [OPCOES: ...] quando quiser mostrar botões
+// Instrução atualizada para o Erro 3: Força a IA a gerar os dados estruturados no fechamento
 const SYSTEM_INSTRUCTION = `Você é a Nina, assistente virtual calorosa, prestativa e profissional da Novaes Planejados (empresa de móveis sob medida em Campo Grande, RJ, dos fundadores Marcela e Carlos Daniel). 
-Seu objetivo é guiar o cliente para entender o projeto dos sonhos dele e coletar 5 informações essenciais:
+Seu objetivo é guiar o cliente para entender o projeto dos sonhos dele e coletar estas informações essenciais:
 1. Nome completo
 2. WhatsApp com DDD
-3. Endereço (rua, bairro) e se é Casa ou Apartamento
-4. Qual ambiente quer planejar (Cozinha, quarto, etc.) e se já tem eletrodomésticos.
+3. Endereço completo (rua, bairro, cidade) e se é Casa ou Apartamento
+4. Qual ambiente quer planejar (Cozinha, quarto, etc.), cor preferida, estilo e eletrodomésticos que possui (marca/modelo de geladeira, fogão, microondas, coifa, máquina de lavar).
 5. Se deseja agendar uma Visita Técnica gratuita.
 
 Regras de Atendimento:
-- Nunca mande uma lista de perguntas de uma vez só. Pegue as informações uma por uma, de forma natural.
-- REGRA DOS BOTÕES: Sempre que for dar opções óbvias para o cliente escolher, você DEVE terminar a sua mensagem com a tag: [OPCOES: Opção 1, Opção 2...]. 
+- Nunca mande uma lista de perguntas de uma vez só. Pegue as informações uma por uma, de forma fluida.
+- Se o cliente perguntar sobre prazos (nosso prazo é de 30 dias) ou pagamentos (até 12x no cartão), responda e retorne delicadamente à coleta.
+- REGRA DOS BOTÕES: Sempre que for dar opções óbvias para o cliente escolher, você DEVE terminar a sua mensagem com a tag estrita: [OPCOES: Opção 1, Opção 2...]. 
   Exemplos de uso obrigatório de botões:
   - Ao perguntar o tipo de imóvel: [OPCOES: 🏠 Casa, 🏢 Apartamento]
   - Ao perguntar a visita: [OPCOES: ✅ Sim, quero agendar, 📱 Prefiro enviar online]
   - Ao perguntar o ambiente: [OPCOES: 🍳 Cozinha, 🛏 Quarto, 🛋 Sala, 🫧 Banheiro, 👕 Lavanderia]
   - Ao perguntar cores: [OPCOES: ⬜ Branco, 🩶 Grafite, 🤎 Amadeirado, 🖤 Preto, 🎨 Ainda não sei]
-- No momento exato em que você notar que conseguiu coletar tudo, encerre a sua resposta escrevendo estritamente a tag: [CONCLUIDO] no final.`;
 
+- CRÍTICO (FECHAMENTO): No momento exato em que você terminar de coletar tudo, encerre a conversa escrevendo a tag: [CONCLUIDO] seguido IMEDIATAMENTE por um objeto JSON com o sumário estruturado dos dados coletados, sem textos adicionais após o JSON. Use este formato exato:
+[CONCLUIDO]{"nome":"...", "tel":"...", "end":"...", "tipo":"...", "visita":"...", "ambiente":"...", "cor":"...", "estilo":"...", "geladeira":"...", "fogao":"...", "outros":"...", "microondas":"...", "coifa":"...", "maquina":"..."}`;
+  
 function startChat() {
   if (!apiKey) {
     apiKey = prompt("Por favor, insira sua Gemini API Key para ativar o Agente de IA da Nina:");
@@ -966,6 +970,8 @@ function startChat() {
 
   chatStarted = true;
   chatHistory = [];
+  currentIaStep = 0;
+  updateSidebar(0); // Inicia a barra lateral no passo 1
   document.getElementById('chat-messages').innerHTML = '';
   
   const saudacao = "Olá! 🌿 Sou a Nina, assistente virtual da Novaes Planejados. Estou aqui para entender o seu sonho e montar o seu orçamento sob medida. Para começarmos, qual é o seu nome completo?";
@@ -977,9 +983,15 @@ function startChat() {
 
 async function perguntarAoGemini(mensagemUsuario) {
   showTyping();
-  clearOptions(); // Limpa botões antigos
+  clearOptions(); 
   
   chatHistory.push({ role: "user", parts: [{ text: mensagemUsuario }] });
+
+  // Faz a barra lateral avançar visualmente a cada mensagem do cliente
+  if (currentIaStep < 4) {
+    currentIaStep++;
+    updateSidebar(currentIaStep);
+  }
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
@@ -987,7 +999,7 @@ async function perguntarAoGemini(mensagemUsuario) {
     const response = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ contents: chatHistory, systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] }, generationConfig: { temperature: 0.5 } })
+      body: JSON.stringify({ contents: chatHistory, systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] }, generationConfig: { temperature: 0.4 } })
     });
 
     const data = await response.json();
@@ -995,17 +1007,31 @@ async function perguntarAoGemini(mensagemUsuario) {
 
     if (data.candidates && data.candidates[0].content.parts[0].text) {
       let respostaIA = data.candidates[0].content.parts[0].text;
-      chatHistory.push({ role: "model", parts: [{ text: respostaIA }] });
 
-      // GATILHO 1: Se a IA finalizou o papo
+      // GATILHO DE FECHAMENTO (CORREÇÃO DO ERRO 3): Captura o JSON da IA
       if (respostaIA.includes("[CONCLUIDO]")) {
-        respostaIA = respostaIA.replace("[CONCLUIDO]", "").trim();
-        addAiMsg(respostaIA);
-        extrairDadosFinaisDoChat();
+        let partes = respostaIA.split("[CONCLUIDO]");
+        let textoFinal = partes[0].trim();
+        let jsonTexto = partes[1].trim();
+
+        if (textoFinal) addAiMsg(textoFinal);
+        else addAiMsg("Perfeito! Montei o painel com o resumo das especificações do seu projeto.");
+
+        try {
+          // Converte o texto da IA em dados reais e atualiza o resumo
+          let dadosExtraidos = JSON.parse(jsonTexto);
+          Object.assign(userData, dadosExtraidos);
+        } catch (e) {
+          console.error("Erro ao processar dados da IA:", e);
+          userData.nome = chatHistory[1]?.parts[0].text || "Cliente Novaes";
+        }
+
+        updateSidebar(5); // Conclui os passos da barra lateral (100%)
+        setTimeout(() => { showSummary(); }, 2000);
         return;
       }
 
-      // GATILHO 2: Se a IA mandou opções de botões
+      // GATILHO DOS BOTÕES
       if (respostaIA.includes("[OPCOES:")) {
         let partes = respostaIA.split("[OPCOES:");
         let textoLimpo = partes[0].trim();
@@ -1013,17 +1039,17 @@ async function perguntarAoGemini(mensagemUsuario) {
         let listaOpcoes = opcoesTexto.split(",").map(o => o.trim());
 
         addAiMsg(textoLimpo);
-        
-        // Renderiza os botões na tela do usuário
+        chatHistory.push({ role: "model", parts: [{ text: respostaIA }] });
+
         setOptions(listaOpcoes, (opcaoEscolhida) => {
-          // Quando o cliente clica no botão, o texto vai automático para a IA
           perguntarAoGemini(opcaoEscolhida);
         });
         return;
       }
 
-      // Comportamento normal por texto
+      // Conversa por texto normal
       addAiMsg(respostaIA);
+      chatHistory.push({ role: "model", parts: [{ text: respostaIA }] });
       enableInput("Digite sua resposta...");
     }
   } catch (error) {
@@ -1031,7 +1057,6 @@ async function perguntarAoGemini(mensagemUsuario) {
     addAiMsg("Houve um erro ao conectar com a Nina. Verifique sua conexão ou API Key.");
   }
 }
-
 // ---- FUNÇÕES VISUAIS INTEGRADAS ----
 function addAiMsg(html) {
   const msgs = document.getElementById('chat-messages');
@@ -1108,20 +1133,18 @@ document.getElementById('chat-input').addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendUserMsg(); }
 });
 
-function updateSidebar(idx) {
-  const pct = Math.min(Math.round(((idx + 1) / flow.length) * 100), 100);
+function updateSidebar(stepNumber) {
+  const totalSteps = 6;
+  const pct = Math.min(Math.round(((stepNumber + 1) / totalSteps) * 100), 100);
   document.getElementById('progress-fill').style.width = pct + '%';
   document.getElementById('progress-pct').textContent = pct + '%';
 
-  // Atualizando o mapa para refletir o novo tamanho do array do fluxo
-  const stepMap = {
-    0:0, 1:0,               // 1. Identificação
-    2:1, 3:1,               // 2. Localização
-    4:2,                    // 3. Ambiente
-    5:3, 6:3,               // 4. Estilo
-    7:4, 8:4, 9:4, 10:4, 11:4, 12:4, // 5. Medidas (incluindo as condicionais)
-    13:5, 14:5              // 6. Resumo
-  };
+  document.querySelectorAll('.step-item').forEach((el, i) => {
+    el.classList.remove('active','done');
+    if (i < stepNumber) el.classList.add('done');
+    else if (i === stepNumber) el.classList.add('active');
+  });
+}
   
   const sidebarStep = stepMap[idx] ?? 0;
   document.querySelectorAll('.step-item').forEach((el, i) => {
