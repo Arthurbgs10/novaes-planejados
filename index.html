@@ -1,4 +1,3 @@
-HTML
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -692,7 +691,7 @@ HTML
       </div>
       <div class="portfolio-item" data-cat="cozinha" style="height:220px; border-radius:var(--radius);">
         <img src="assets/image_6ed119.jpg" alt="Cozinha Executada" />
-        <div class="portfolio-overlay"><span class="portfolio-label">Execução perfeita do 3D para a realidade</span></div>
+        <div class="portfolio-overlay"><span class="portfolio-label">Execução perfeita do 3D para a reality</span></div>
       </div>
     </div>
 
@@ -1019,7 +1018,7 @@ async function perguntarAoGemini(mensagemUsuario) {
         else addAiMsg("Perfeito! Montei o painel com o resumo das especificações do seu projeto.");
 
         try {
-          // Converte o texto da IA em dados reais e atualiza o resumo
+          // Converte o texto da IA em dados reais e updates o resumo
           let dadosExtraidos = JSON.parse(jsonTexto);
           Object.assign(userData, dadosExtraidos);
         } catch (e) {
@@ -1150,7 +1149,6 @@ function updateSidebar(stepNumber) {
   });
 }
 
-// Abre a tela de resumo chique com os dados capturados pela IA
 function showSummary() {
   document.getElementById('sum-nome').textContent = userData.nome || '—';
   document.getElementById('sum-tel').textContent = userData.tel || '—';
@@ -1164,37 +1162,40 @@ function showSummary() {
   document.getElementById('sum-fogao').textContent = userData.fogao || '—';
   document.getElementById('sum-outros').textContent = userData.outros || '—';
 
-  // Exibe as linhas de equipamentos extras apenas se a IA os capturou
-  if (userData.microondas && userData.microondas !== '—') {
-    const row = document.getElementById('row-microondas');
-    const val = document.getElementById('sum-microondas');
-    if (row) row.style.display = 'flex';
-    if (val) val.textContent = userData.microondas;
+  // Exibe os equipamentos dinâmicos no resumo apenas se foram preenchidos
+  if(userData.microondas) {
+      document.getElementById('row-microondas').style.display = 'flex';
+      document.getElementById('sum-microondas').textContent = userData.microondas;
   }
-  if (userData.coifa && userData.coifa !== '—') {
-    const row = document.getElementById('row-coifa');
-    const val = document.getElementById('sum-coifa');
-    if (row) row.style.display = 'flex';
-    if (val) val.textContent = userData.coifa;
+  if(userData.coifa) {
+      document.getElementById('row-coifa').style.display = 'flex';
+      document.getElementById('sum-coifa').textContent = userData.coifa;
   }
-  if (userData.maquina && userData.maquina !== '—') {
-    const row = document.getElementById('row-maquina');
-    const val = document.getElementById('sum-maquina');
-    if (row) row.style.display = 'flex';
-    if (val) val.textContent = userData.maquina;
+  if(userData.maquina) {
+      document.getElementById('row-maquina').style.display = 'flex';
+      document.getElementById('sum-maquina').textContent = userData.maquina;
   }
 
-  // Remove a classe hidden para suavizar a entrada do painel
-  const overlay = document.getElementById('summary-overlay');
-  if (overlay) overlay.classList.remove('hidden');
+  setTimeout(() => {
+    document.getElementById('summary-overlay').classList.remove('hidden');
+  }, 1500);
 }
 
-// Formata o relatório final e dispara para o WhatsApp da Novaes
 function sendToWhatsApp() {
+  // LÓGICA CONCEITUAL TIPO GOOGLE FORMS:
+  /*
+  fetch('SUA_URL_DO_WEBHOOK_AQUI', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(userData)
+  }).then(response => console.log('Dados enviados pro Sheets com sucesso!'));
+  */
+
+  // Formatando o texto dinamicamente para o WhatsApp
   let equipText = `*Geladeira:* ${userData.geladeira}\n*Fogão/Cooktop:* ${userData.fogao}\n`;
-  if (userData.microondas && userData.microondas !== '—') equipText += `*Microondas:* ${userData.microondas}\n`;
-  if (userData.coifa && userData.coifa !== '—') equipText += `*Coifa/Depurador:* ${userData.coifa}\n`;
-  if (userData.maquina && userData.maquina !== '—') equipText += `*Máquina de Lavar:* ${userData.maquina}\n`;
+  if (userData.microondas) equipText += `*Microondas:* ${userData.microondas}\n`;
+  if (userData.coifa) equipText += `*Coifa/Depurador:* ${userData.coifa}\n`;
+  if (userData.maquina) equipText += `*Máquina de Lavar:* ${userData.maquina}\n`;
   if (!userData.microondas && !userData.coifa && !userData.maquina) equipText += `*Outros Itens:* ${userData.outros}\n`;
 
   const msg = encodeURIComponent(
