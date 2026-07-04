@@ -968,7 +968,7 @@ function startChat() {
   }
 
   chatStarted = true;
-  chatHistory = []; // Começa vazio para cumprir a regra da API de iniciar obrigatoriamente com o usuário
+  chatHistory = []; 
   currentIaStep = 0;
   updateSidebar(0); 
   document.getElementById('chat-messages').innerHTML = '';
@@ -1063,132 +1063,7 @@ function addAiMsg(html) {
   msgs.scrollTop = msgs.scrollHeight;
 }
 
-function addUserMsg(text) {
-  const msgs = document.getElementById('chat-messages');
-  const div = document.createElement('div');
-  div.className = 'msg user';
-  div.innerHTML = `<div class="msg-bubble">${text}</div><div class="msg-avatar" style="background:var(--green);color:white;">U</div>`;
-  msgs.appendChild(div);
-  msgs.scrollTop = msgs.scrollHeight;
+// ... the rest ...
+"""
+print("Analysis complete.")
 }
-
-let typingEl = null;
-function showTyping() {
-  if (typingEl) return;
-  const msgs = document.getElementById('chat-messages');
-  typingEl = document.createElement('div');
-  typingEl.className = 'msg ai';
-  typingEl.innerHTML = `<div class="msg-avatar">N</div><div class="msg-bubble"><div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;
-  msgs.appendChild(typingEl);
-  msgs.scrollTop = msgs.scrollHeight;
-}
-
-function hideTyping() {
-  if (typingEl) { typingEl.remove(); typingEl = null; }
-}
-
-function setOptions(opts, callback, multi = false) {
-  const grid = document.getElementById('options-grid');
-  grid.innerHTML = '';
-  multiSelected = [];
-
-  opts.forEach(opt => {
-    const btn = document.createElement('button');
-    btn.className = 'opt-btn';
-    btn.textContent = opt;
-    btn.onclick = () => {
-      addUserMsg(opt);
-      clearOptions(); 
-      callback(opt);
-    };
-    grid.appendChild(btn);
-  });
-}
-
-function clearOptions() { document.getElementById('options-grid').innerHTML = ''; }
-function enableInput(p) { const inp = document.getElementById('chat-input'); inp.placeholder = p; inp.focus(); }
-
-function sendUserMsg() {
-  const inp = document.getElementById('chat-input');
-  const val = inp.value.trim();
-  if (!val) return;
-  inp.value = '';
-  addUserMsg(val);
-  perguntarAoGemini(val);
-}
-
-// ---- CONTROLES DE EVENTO ----
-document.getElementById('chat-input').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !e.shiftKey) { 
-    e.preventDefault(); 
-    sendUserMsg(); 
-  }
-});
-
-function updateSidebar(stepNumber) {
-  const totalSteps = 6;
-  const pct = Math.min(Math.round(((stepNumber + 1) / totalSteps) * 100), 100);
-  
-  const fillEl = document.getElementById('progress-fill');
-  const pctEl = document.getElementById('progress-pct');
-  
-  if (fillEl) fillEl.style.width = pct + '%';
-  if (pctEl) pctEl.textContent = pct + '%';
-
-  document.querySelectorAll('.step-item').forEach((el, i) => {
-    el.classList.remove('active', 'done');
-    if (i < stepNumber) el.classList.add('done');
-    else if (i === stepNumber) el.classList.add('active');
-  });
-}
-
-function showSummary() {
-  document.getElementById('sum-nome').textContent = userData.nome || '—';
-  document.getElementById('sum-tel').textContent = userData.tel || '—';
-  document.getElementById('sum-end').textContent = userData.end || '—';
-  document.getElementById('sum-tipo').textContent = userData.tipo || '—';
-  document.getElementById('sum-visita').textContent = userData.visita || '—';
-  document.getElementById('sum-ambiente').textContent = userData.ambiente || '—';
-  document.getElementById('sum-cor').textContent = userData.cor || '—';
-  document.getElementById('sum-estilo').textContent = userData.estilo || '—';
-  document.getElementById('sum-geladeira').textContent = userData.geladeira || '—';
-  document.getElementById('sum-fogao').textContent = userData.fogao || '—';
-  document.getElementById('sum-outros').textContent = userData.outros || '—';
-
-  if(userData.microondas) {
-      document.getElementById('row-microondas').style.display = 'flex';
-      document.getElementById('sum-microondas').textContent = userData.microondas;
-  }
-  if(userData.coifa) {
-      document.getElementById('row-coifa').style.display = 'flex';
-      document.getElementById('sum-coifa').textContent = userData.coifa;
-  }
-  if(userData.maquina) {
-      document.getElementById('row-maquina').style.display = 'flex';
-      document.getElementById('sum-maquina').textContent = userData.maquina;
-  }
-
-  setTimeout(() => {
-    document.getElementById('summary-overlay').classList.remove('hidden');
-  }, 1500);
-}
-
-function sendToWhatsApp() {
-  let equipText = `*Geladeira:* ${userData.geladeira}\n*Fogão/Cooktop:* ${userData.fogao}\n`;
-  if (userData.microondas) equipText += `*Microondas:* ${userData.microondas}\n`;
-  if (userData.coifa) equipText += `*Coifa/Depurador:* ${userData.coifa}\n`;
-  if (userData.maquina) equipText += `*Máquina de Lavar:* ${userData.maquina}\n`;
-  if (!userData.microondas && !userData.coifa && !userData.maquina) equipText += `*Outros Itens:* ${userData.outros}\n`;
-
-  const msg = encodeURIComponent(
-    `*Novo pedido de orçamento — Novaes Planejados* 🌿\n\n` +
-    `*Nome:* ${userData.nome}\n*Telefone:* ${userData.tel}\n*Endereço:* ${userData.end}\n*Imóvel:* ${userData.tipo}\n*Visita:* ${userData.visita}\n\n` +
-    `*Ambiente:* ${userData.ambiente}\n*Cor:* ${userData.cor}\n*Estilo:* ${userData.estilo}\n\n` +
-    equipText + `\n` +
-    `_Pedido gerado com suporte da IA Novaes Planejados_`
-  );
-  window.open(`https://wa.me/5521980859778?text=${msg}`, '_blank');
-}
-</script>
-</body>
-</html>
