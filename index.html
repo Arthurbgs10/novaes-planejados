@@ -163,7 +163,7 @@
     background: var(--green-dark); padding: 2rem 5%;
     display: flex; justify-content: center; gap: 5rem; flex-wrap: wrap;
   }
-  .stats .stat { text-align: center; }
+  .stat { text-align: center; }
   .stat-num {
     font-family: 'Cormorant Garamond', serif;
     font-size: 2.2rem; font-weight: 300; color: white; display: block;
@@ -622,7 +622,7 @@
   <section class="section">
     <div class="section-tag">Nossos projetos</div>
     <h2 class="section-title">Cada ambiente tem <em>uma história</em></h2>
-    <p class="section-sub">Cozinhas, quartos, salas e muito mais — planejados para o seu jeito de viver.</p>
+    <p class="section-sub">Cozinhas, quartos, salas and muito mais — planejados para o seu jeito de viver.</p>
     <div class="portfolio-grid">
       <div class="portfolio-item">
         <img src="assets/image_6ed196.jpg" alt="Cozinha com bancada" />
@@ -907,8 +907,9 @@
     </div>
   </div>
 </div>
+
 <script>
-// ---- NAVEGAÇÃO DO SITE ----
+// ---- NAVIGATION ----
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
@@ -919,7 +920,7 @@ function showPage(id) {
   if (id === 'orcamento' && !chatStarted) startChat();
 }
 
-// ---- FILTRO DO PORTFÓLIO ----
+// ---- PORTFOLIO FILTER ----
 function filterPortfolio(cat, btn) {
   document.querySelectorAll('#portfolio-full-grid .portfolio-item').forEach(item => {
     item.style.display = (cat === 'todos' || item.dataset.cat === cat) ? 'block' : 'none';
@@ -928,136 +929,209 @@ function filterPortfolio(cat, btn) {
   btn.classList.add('selected');
 }
 
-// ---- AGENTE DE IA (NINA) ----
+// ---- CHAT ENGINE (VERSÃO FLUXO TRADICIONAL ESTÁVEL RESTAURADA) ----
 let chatStarted = false;
-let apiKey = "";
-let chatHistory = []; 
-let currentIaStep = 0; 
-
-let userData = { nome: '—', tel: '—', end: '—', tipo: '—', visita: '—', ambiente: '—', cor: '—', estilo: '—', geladeira: '—', fogao: '—', outros: '—', microondas: '', coifa: '', maquina: '' };
+let stepIdx = 0;
+let userData = { nome:'', tel:'', end:'', tipo:'', visita:'', ambiente:'', cor:'', estilo:'', geladeira:'', fogao:'', outros:'', microondas:'', coifa:'', maquina:'' };
 let awaitingInput = null;
+
+const flow = [
+  {
+    messages: [
+      { delay: 400, text: "Olá! 🌿 Sou a Nina, assistente da <strong>Novaes Planejados</strong>. Estou aqui para te ajudar a solicitar seu orçamento de móveis planejados." },
+      { delay: 1600, text: "Vamos começar? Qual é o seu <strong>nome completo</strong>?" }
+    ],
+    input: true,
+    inputPlaceholder: "Digite seu nome...",
+    onInput: (val) => { userData.nome = val; }
+  },
+  {
+    messages: [
+      { delay: 400, text: (u) => `Prazer, <strong>${u.nome}</strong>! 😊 Agora me passa o seu <strong>número de WhatsApp</strong> com DDD.` }
+    ],
+    input: true,
+    inputPlaceholder: "(21) 99999-9999",
+    onInput: (val) => { userData.tel = val; }
+  },
+  {
+    messages: [
+      { delay: 400, text: "Perfeito! Agora preciso do seu <strong>endereço completo</strong> — rua, número, bairro e cidade — para verificar se conseguimos atender sua região." }
+    ],
+    input: true,
+    inputPlaceholder: "Ex: Rua das Flores, 123 — Campo Grande, RJ",
+    onInput: (val) => { userData.end = val; }
+  },
+  {
+    messages: [
+      { delay: 400, text: "Anotado! E esse endereço é de <strong>apartamento ou casa</strong>?" }
+    ],
+    options: ["🏠 Casa", "🏢 Apartamento"],
+    onOption: (val) => { userData.tipo = val; }
+  },
+  {
+    messages: [
+      { delay: 400, text: "Certo! Me conta: qual <strong>ambiente</strong> você quer planejar? (pode escolher mais de um)" }
+    ],
+    options: ["🍳 Cozinha", "🛏 Quarto", "🛋 Sala", "🫧 Banheiro", "👕 Lavanderia", "💼 Home office"],
+    multiSelect: true,
+    onOption: (val) => { userData.ambiente = val; }
+  },
+  {
+    messages: [
+      { delay: 400, text: "Que bacana! E qual <strong>estilo</strong> mais combina com você para esse projeto?" }
+    ],
+    options: ["✨ Moderno e clean", "🤍 Minimalista branco", "🖤 Escuro e sofisticado", "🌿 Natural e acolhedor", "💡 Não sei ainda, preciso de inspiração!"],
+    onOption: (val) => {
+      userData.estilo = val;
+      if (val.includes("inspiração")) {
+        setTimeout(() => {
+          addAiMsg("Sem pressão! 😊 Depois você pode dar uma olhada no nosso portfólio para se inspirar e ver o que mais te chama a atenção.");
+        }, 800);
+      }
+    }
+  },
+  {
+    messages: [
+      { delay: 800, text: "Você tem alguma <strong>cor em mente</strong> para os móveis?" }
+    ],
+    options: ["⬜ Branco", "🩶 Cinza / Grafite", "🤎 Madeira / Natural", "🖤 Preto", "💚 Verde / Sage", "🎨 Ainda não sei"],
+    onOption: (val) => { userData.cor = val; }
+  },
+  {
+    messages: [
+      { delay: 400, text: "Quase lá! 🎉 Para deixarmos tudo sob medida, preciso saber quais eletrodomésticos você tem ou planeja ter. Qual é o modelo da sua <strong>geladeira</strong>? (ex: Brastemp 400L duplex)" }
+    ],
+    input: true,
+    inputPlaceholder: "Marca e modelo da geladeira...",
+    onInput: (val) => { userData.geladeira = val; }
+  },
+  {
+    messages: [
+      { delay: 400, text: "E o <strong>fogão ou cooktop</strong>? (ex: Electrolux 5 bocas, embutir)" }
+    ],
+    input: true,
+    inputPlaceholder: "Modelo do fogão/cooktop...",
+    onInput: (val) => { userData.fogao = val; }
+  },
+  {
+    messages: [
+      { delay: 400, text: "Tem <strong>microondas, coifa ou máquina de lavar</strong> para incluir no projeto?" }
+    ],
+    options: ["Sim, tenho microondas", "Sim, tenho coifa", "Sim, tenho máquina de lavar", "Não por enquanto"],
+    multiSelect: true,
+    onOption: (val) => { userData.outros = val; }
+  },
+  {
+    condition: () => userData.outros.includes("microondas"),
+    messages: [
+      { delay: 400, text: "Certo! Qual é a marca e o modelo do seu <strong>microondas</strong>? (ex: Electrolux 31L de embutir)" }
+    ],
+    input: true,
+    inputPlaceholder: "Modelo do microondas...",
+    onInput: (val) => { userData.microondas = val; }
+  },
+  {
+    condition: () => userData.outros.includes("coifa"),
+    messages: [
+      { delay: 400, text: "E sobre a <strong>coifa ou depurador</strong>, qual é o modelo? (ex: Tramontina 90cm parede)" }
+    ],
+    input: true,
+    inputPlaceholder: "Modelo da coifa...",
+    onInput: (val) => { userData.coifa = val; }
+  },
+  {
+    condition: () => userData.outros.includes("máquina de lavar"),
+    messages: [
+      { delay: 400, text: "Para a lavanderia, qual é a sua <strong>máquina de lavar</strong>? (ex: Samsung Lava e Seca 11kg frontal)" }
+    ],
+    input: true,
+    inputPlaceholder: "Modelo da máquina...",
+    onInput: (val) => { userData.maquina = val; }
+  },
+  {
+    messages: [
+      { delay: 600, text: "Ótimo! ✦ Nossos especialistas adoram fazer uma <strong>visita técnica</strong> para tomar as medidas com precisão e te mostrar nosso catálogo de cores pessoalmente. Você gostaria de agendar?" }
+    ],
+    options: ["✅ Sim, quero agendar visita", "📱 Prefiro enviar as informações online"],
+    onOption: (val) => {
+      userData.visita = val.includes("Sim") ? "Sim" : "Não";
+      if (userData.visita === "Sim") {
+        setTimeout(() => {
+          addAiMsg("Perfeito! 🗓 Um dos nossos agentes entrará em contato para tratar a visita.");
+        }, 800);
+      } else {
+        setTimeout(() => {
+          addAiMsg("Sem problema! Já temos a base de informações que precisamos para montar seu projeto inicial. 📐");
+        }, 800);
+      }
+    }
+  },
+  {
+    messages: [
+      { delay: 2000, text: "🌟 Incrível! Já temos tudo que precisamos." },
+      { delay: 1000, text: (u) => `Vou gerar agora o resumo do seu pedido, <strong>${u.nome.split(' ')[0]}</strong>. Você poderá revisá-lo e enviar diretamente para nossa equipe!` }
+    ],
+    final: true
+  }
+];
+
 let multiSelected = [];
 
-const SYSTEM_INSTRUCTION = `Você é a Nina, assistente virtual calorosa, prestativa e profissional da Novaes Planejados (empresa de móveis sob medida em Campo Grande, RJ, dos fundadores Marcela e Carlos Daniel). 
-Seu objetivo é guiar o cliente para entender o projeto dos sonhos dele e coletar estas informações essenciais:
-1. Nome completo
-2. WhatsApp com DDD
-3. Endereço completo (rua, bairro, cidade) e se é Casa ou Apartamento
-4. Qual ambiente quer planejar (Cozinha, quarto, etc.), cor preferida, estilo e eletrodomésticos que possui (marca/modelo de geladeira, fogão, microondas, coifa, máquina de lavar).
-5. Se deseja agendar uma Visita Técnica gratuita.
-
-Regras de Atendimento:
-- Nunca mande uma lista de perguntas de uma vez só. Pegue as informações uma por uma, de forma fluida.
-- Se o cliente perguntar sobre prazos (nosso prazo é de 30 dias) ou pagamentos (até 12x no cartão), responda e retorne delicadamente à coleta.
-- REGRA DOS BOTÕES: Sempre que for dar opções óbvias para o cliente escolher, você DEVE terminar a sua mensagem com a tag estrita: [OPCOES: Opção 1, Opção 2...]. 
-  Exemplos de uso obrigatório de botões:
-  - Ao perguntar o tipo de imóvel: [OPCOES: 🏠 Casa, 🏢 Apartamento]
-  - Ao perguntar a visita: [OPCOES: ✅ Sim, quero agendar, 📱 Prefiro enviar online]
-  - Ao perguntar o ambiente: [OPCOES: 🍳 Cozinha, 🛏 Quarto, 🛋 Sala, 🫧 Banheiro, 👕 Lavanderia]
-  - Ao perguntar cores: [OPCOES: ⬜ Branco, 🩶 Grafite, 🤎 Amadeirado, 🖤 Preto, 🎨 Ainda não sei]
-
-- CRÍTICO (FECHAMENTO): No momento exato em que você terminar de coletar tudo, encerre a conversa escrevendo a tag: [CONCLUIDO] seguido IMEDIATAMENTE por um objeto JSON com o sumário estruturado dos dados coletados, sem textos adicionais após o JSON. Use este formato exato:
-[CONCLUIDO]{"nome":"...", "tel":"...", "end":"...", "tipo":"...", "visita":"...", "ambiente":"...", "cor":"...", "estilo":"...", "geladeira":"...", "fogao":"...", "outros":"...", "microondas":"...", "coifa":"...", "maquina":"..."}`;
-  
 function startChat() {
-  if (!apiKey) {
-    apiKey = prompt("Por favor, insira sua Gemini API Key para ativar o Agente de IA da Nina:");
-    if (!apiKey) {
-      alert("A API Key é necessária para rodar o teste com inteligência artificial.");
-      return;
-    }
-  }
-
   chatStarted = true;
-  chatHistory = []; // Corrigido: Inicia 100% vazio para obedecer à regra do Google
-  currentIaStep = 0;
-  updateSidebar(0); 
-  document.getElementById('chat-messages').innerHTML = '';
-  
-  const saudacao = "Olá! 🌿 Sou a Nina, assistente virtual da Novaes Planejados. Estou aqui para entender o seu sonho e montar o seu orçamento sob medida. Para começarmos, qual é o seu nome completo?";
-  addAiMsg(saudacao);
-  enableInput("Digite seu nome...");
+  stepIdx = 0;
+  runStep(0);
 }
 
-async function perguntarAoGemini(mensagemUsuario) {
-  showTyping();
-  clearOptions(); 
-  
-  chatHistory.push({ role: "user", parts: [{ text: mensagemUsuario }] });
+function runStep(idx) {
+  const step = flow[idx];
+  if (!step) return;
 
-  if (currentIaStep < 4) {
-    currentIaStep++;
-    updateSidebar(currentIaStep);
+  if (step.condition && !step.condition()) {
+    stepIdx++;
+    runStep(stepIdx);
+    return;
   }
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  awaitingInput = null;
+  clearOptions();
 
-  try {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ contents: chatHistory, systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] }, generationConfig: { temperature: 0.4 } })
-    });
-
-    const data = await response.json();
-    hideTyping();
-
-    if (data.candidates && data.candidates[0].content.parts[0].text) {
-      let respostaIA = data.candidates[0].content.parts[0].text;
-      
-      // Salva a resposta no histórico respeitando a alternância da API
-      chatHistory.push({ role: "model", parts: [{ text: respostaIA }] });
-
-      // GATILHO DE FECHAMENTO
-      if (respostaIA.includes("[CONCLUIDO]")) {
-        let partes = respostaIA.split("[CONCLUIDO]");
-        let textoFinal = partes[0].trim();
-        let jsonTexto = partes[1].trim();
-
-        if (textoFinal) addAiMsg(textoFinal);
-        else addAiMsg("Perfeito! Montei o painel com o resumo das especificações do seu projeto.");
-
-        try {
-          let dadosExtraidos = JSON.parse(jsonTexto);
-          Object.assign(userData, dadosExtraidos);
-        } catch (e) {
-          console.error("Erro ao processar dados da IA:", e);
-          userData.nome = chatHistory[0]?.parts[0].text || "Cliente Novaes";
-        }
-
-        updateSidebar(5); 
-        setTimeout(() => { showSummary(); }, 2000);
-        return;
+  let delay = 0;
+  step.messages.forEach((msg, i) => {
+    setTimeout(() => {
+      if (i < step.messages.length - 1) showTyping();
+    }, delay);
+    delay += msg.delay || 800;
+    setTimeout(() => {
+      hideTyping();
+      const text = typeof msg.text === 'function' ? msg.text(userData) : msg.text;
+      addAiMsg(text);
+      if (i === step.messages.length - 1) {
+        setTimeout(() => {
+          if (step.final) {
+            showSummary();
+            return;
+          }
+          if (step.options && step.options.length > 0) {
+            multiSelected = [];
+            setOptions(step.options, (val) => {
+              if (step.onOption) step.onOption(val);
+              updateSidebar(stepIdx);
+              stepIdx++;
+              setTimeout(() => runStep(stepIdx), 1500);
+            }, step.multiSelect);
+          }
+          if (step.input) {
+            enableInput(step.inputPlaceholder || 'Digite aqui...');
+            awaitingInput = step;
+          }
+        }, 400);
       }
-
-      // GATILHO DOS BOTÕES
-      if (respostaIA.includes("[OPCOES:")) {
-        let partes = respostaIA.split("[OPCOES:");
-        let textoLimpo = partes[0].trim();
-        let opcoesTexto = partes[1].replace("]", "").trim();
-        let listaOpcoes = opcoesTexto.split(",").map(o => o.trim());
-
-        addAiMsg(textoLimpo);
-
-        setOptions(listaOpcoes, (opcaoEscolhida) => {
-          perguntarAoGemini(opcaoEscolhida);
-        });
-        return;
-      }
-
-      addAiMsg(respostaIA);
-      enableInput("Digite sua resposta...");
-    } else {
-      addAiMsg("Houve um problema de comunicação com os servidores da API.");
-      console.error("Erro da API Gemini:", data);
-    }
-  } catch (error) {
-    hideTyping();
-    addAiMsg("Houve um erro ao conectar com a Nina. Verifique sua conexão ou API Key.");
-  }
+    }, delay);
+    delay += 600;
+  });
 }
 
-// ---- FUNÇÕES VISUAIS DO CHAT ----
 function addAiMsg(html) {
   const msgs = document.getElementById('chat-messages');
   const div = document.createElement('div');
@@ -1101,48 +1175,76 @@ function setOptions(opts, callback, multi = false) {
     btn.className = 'opt-btn';
     btn.textContent = opt;
     btn.onclick = () => {
-      addUserMsg(opt);
-      clearOptions(); 
-      callback(opt);
+      if (multi) {
+        btn.classList.toggle('selected');
+        if (btn.classList.contains('selected')) multiSelected.push(opt);
+        else multiSelected = multiSelected.filter(v => v !== opt);
+        
+        if (!document.getElementById('confirm-multi')) {
+          const conf = document.createElement('button');
+          conf.id = 'confirm-multi';
+          conf.className = 'btn-primary';
+          conf.style = 'margin-top:8px;padding:10px 20px;font-size:0.82rem;';
+          conf.textContent = 'Confirmar seleção →';
+          conf.onclick = () => {
+            const val = multiSelected.join(', ') || opts[opts.length-1];
+            addUserMsg(val);
+            clearOptions(); 
+            callback(val);
+          };
+          grid.appendChild(conf);
+        }
+      } else {
+        addUserMsg(opt);
+        clearOptions(); 
+        callback(opt);
+      }
     };
     grid.appendChild(btn);
   });
 }
 
 function clearOptions() { document.getElementById('options-grid').innerHTML = ''; }
-function enableInput(p) { const inp = document.getElementById('chat-input'); inp.placeholder = p; inp.focus(); }
+function enableInput(placeholder) { const inp = document.getElementById('chat-input'); inp.placeholder = placeholder; inp.focus(); }
 
 function sendUserMsg() {
   const inp = document.getElementById('chat-input');
   const val = inp.value.trim();
   if (!val) return;
   inp.value = '';
-  addUserMsg(val);
-  perguntarAoGemini(val);
+  if (awaitingInput) {
+    addUserMsg(val);
+    awaitingInput.onInput(val);
+    updateSidebar(stepIdx);
+    awaitingInput = null;
+    stepIdx++;
+    setTimeout(() => runStep(stepIdx), 600);
+  }
 }
 
-// ---- CONTROLES DE INTERFACE E EVENTOS ----
 document.getElementById('chat-input').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !e.shiftKey) { 
-    e.preventDefault(); 
-    sendUserMsg(); 
-  }
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendUserMsg(); }
 });
 
-function updateSidebar(stepNumber) {
-  const totalSteps = 6;
-  const pct = Math.min(Math.round(((stepNumber + 1) / totalSteps) * 100), 100);
-  
-  const fillEl = document.getElementById('progress-fill');
-  const pctEl = document.getElementById('progress-pct');
-  
-  if (fillEl) fillEl.style.width = pct + '%';
-  if (pctEl) pctEl.textContent = pct + '%';
+function updateSidebar(idx) {
+  const pct = Math.min(Math.round(((idx + 1) / flow.length) * 100), 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = pct + '%';
 
+  const stepMap = {
+    0:0, 1:0,               
+    2:1, 3:1,               
+    4:2,                    
+    5:3, 6:3,               
+    7:4, 8:4, 9:4, 10:4, 11:4, 12:4, 
+    13:5, 14:5              
+  };
+  
+  const sidebarStep = stepMap[idx] ?? 0;
   document.querySelectorAll('.step-item').forEach((el, i) => {
-    el.classList.remove('active', 'done');
-    if (i < stepNumber) el.classList.add('done');
-    else if (i === stepNumber) el.classList.add('active');
+    el.classList.remove('active','done');
+    if (i < sidebarStep) el.classList.add('done');
+    else if (i === sidebarStep) el.classList.add('active');
   });
 }
 
@@ -1189,7 +1291,7 @@ function sendToWhatsApp() {
     `*Nome:* ${userData.nome}\n*Telefone:* ${userData.tel}\n*Endereço:* ${userData.end}\n*Imóvel:* ${userData.tipo}\n*Visita:* ${userData.visita}\n\n` +
     `*Ambiente:* ${userData.ambiente}\n*Cor:* ${userData.cor}\n*Estilo:* ${userData.estilo}\n\n` +
     equipText + `\n` +
-    `_Pedido gerado com suporte da IA Novaes Planejados_`
+    `_Pedido gerado pelo site Novaes Planejados_`
   );
   window.open(`https://wa.me/5521980859778?text=${msg}`, '_blank');
 }
