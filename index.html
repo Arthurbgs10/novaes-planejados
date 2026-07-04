@@ -1122,39 +1122,35 @@ function sendUserMsg() {
   perguntarAoGemini(val);
 }
 
-function extrairDadosFinaisDoChat() {
-  userData.nome = chatHistory[1]?.parts[0].text || "Cliente Novaes";
-  userData.ambiente = "Identificado na conversa pela IA";
-  userData.visita = "Confirmar no WhatsApp";
-  setTimeout(() => { showSummary(); }, 2000);
-}
+// ---- CONTROLES DE EVENTO E INTERFACE DA IA ----
 
-
+// Escuta o teclado para enviar a mensagem ao apertar Enter
 document.getElementById('chat-input').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendUserMsg(); }
+  if (e.key === 'Enter' && !e.shiftKey) { 
+    e.preventDefault(); 
+    sendUserMsg(); 
+  }
 });
 
+// Atualiza a barra de progresso e os passos laterais dinamicamente
 function updateSidebar(stepNumber) {
   const totalSteps = 6;
   const pct = Math.min(Math.round(((stepNumber + 1) / totalSteps) * 100), 100);
-  document.getElementById('progress-fill').style.width = pct + '%';
-  document.getElementById('progress-pct').textContent = pct + '%';
+  
+  const fillEl = document.getElementById('progress-fill');
+  const pctEl = document.getElementById('progress-pct');
+  
+  if (fillEl) fillEl.style.width = pct + '%';
+  if (pctEl) pctEl.textContent = pct + '%';
 
   document.querySelectorAll('.step-item').forEach((el, i) => {
-    el.classList.remove('active','done');
+    el.classList.remove('active', 'done');
     if (i < stepNumber) el.classList.add('done');
     else if (i === stepNumber) el.classList.add('active');
   });
 }
-  
-  const sidebarStep = stepMap[idx] ?? 0;
-  document.querySelectorAll('.step-item').forEach((el, i) => {
-    el.classList.remove('active','done');
-    if (i < sidebarStep) el.classList.add('done');
-    else if (i === sidebarStep) el.classList.add('active');
-  });
-}
 
+// Abre a tela de resumo chique com os dados capturados pela IA
 function showSummary() {
   document.getElementById('sum-nome').textContent = userData.nome || '—';
   document.getElementById('sum-tel').textContent = userData.tel || '—';
@@ -1168,40 +1164,37 @@ function showSummary() {
   document.getElementById('sum-fogao').textContent = userData.fogao || '—';
   document.getElementById('sum-outros').textContent = userData.outros || '—';
 
-  // Exibe os equipamentos dinâmicos no resumo apenas se foram preenchidos
-  if(userData.microondas) {
-      document.getElementById('row-microondas').style.display = 'flex';
-      document.getElementById('sum-microondas').textContent = userData.microondas;
+  // Exibe as linhas de equipamentos extras apenas se a IA os capturou
+  if (userData.microondas && userData.microondas !== '—') {
+    const row = document.getElementById('row-microondas');
+    const val = document.getElementById('sum-microondas');
+    if (row) row.style.display = 'flex';
+    if (val) val.textContent = userData.microondas;
   }
-  if(userData.coifa) {
-      document.getElementById('row-coifa').style.display = 'flex';
-      document.getElementById('sum-coifa').textContent = userData.coifa;
+  if (userData.coifa && userData.coifa !== '—') {
+    const row = document.getElementById('row-coifa');
+    const val = document.getElementById('sum-coifa');
+    if (row) row.style.display = 'flex';
+    if (val) val.textContent = userData.coifa;
   }
-  if(userData.maquina) {
-      document.getElementById('row-maquina').style.display = 'flex';
-      document.getElementById('sum-maquina').textContent = userData.maquina;
+  if (userData.maquina && userData.maquina !== '—') {
+    const row = document.getElementById('row-maquina');
+    const val = document.getElementById('sum-maquina');
+    if (row) row.style.display = 'flex';
+    if (val) val.textContent = userData.maquina;
   }
 
-  setTimeout(() => {
-    document.getElementById('summary-overlay').classList.remove('hidden');
-  }, 1500);
+  // Remove a classe hidden para suavizar a entrada do painel
+  const overlay = document.getElementById('summary-overlay');
+  if (overlay) overlay.classList.remove('hidden');
 }
 
+// Formata o relatório final e dispara para o WhatsApp da Novaes
 function sendToWhatsApp() {
-  // LÓGICA CONCEITUAL TIPO GOOGLE FORMS:
-  /*
-  fetch('SUA_URL_DO_WEBHOOK_AQUI', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(userData)
-  }).then(response => console.log('Dados enviados pro Sheets com sucesso!'));
-  */
-
-  // Formatando o texto dinamicamente para o WhatsApp
   let equipText = `*Geladeira:* ${userData.geladeira}\n*Fogão/Cooktop:* ${userData.fogao}\n`;
-  if (userData.microondas) equipText += `*Microondas:* ${userData.microondas}\n`;
-  if (userData.coifa) equipText += `*Coifa/Depurador:* ${userData.coifa}\n`;
-  if (userData.maquina) equipText += `*Máquina de Lavar:* ${userData.maquina}\n`;
+  if (userData.microondas && userData.microondas !== '—') equipText += `*Microondas:* ${userData.microondas}\n`;
+  if (userData.coifa && userData.coifa !== '—') equipText += `*Coifa/Depurador:* ${userData.coifa}\n`;
+  if (userData.maquina && userData.maquina !== '—') equipText += `*Máquina de Lavar:* ${userData.maquina}\n`;
   if (!userData.microondas && !userData.coifa && !userData.maquina) equipText += `*Outros Itens:* ${userData.outros}\n`;
 
   const msg = encodeURIComponent(
@@ -1209,7 +1202,7 @@ function sendToWhatsApp() {
     `*Nome:* ${userData.nome}\n*Telefone:* ${userData.tel}\n*Endereço:* ${userData.end}\n*Imóvel:* ${userData.tipo}\n*Visita:* ${userData.visita}\n\n` +
     `*Ambiente:* ${userData.ambiente}\n*Cor:* ${userData.cor}\n*Estilo:* ${userData.estilo}\n\n` +
     equipText + `\n` +
-    `_Pedido gerado pelo site Novaes Planejados_`
+    `_Pedido gerado com suporte da IA Novaes Planejados_`
   );
   window.open(`https://wa.me/5521980859778?text=${msg}`, '_blank');
 }
