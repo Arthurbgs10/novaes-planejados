@@ -946,6 +946,17 @@ function showPage(id) {
   const nav = document.getElementById('nav-' + id);
   if (nav) nav.classList.add('active');
   window.scrollTo(0, 0);
+
+  // Esconde o botão flutuante do WhatsApp no chat para não cobrir a seta de enviar
+  const floatWa = document.querySelector('.float-wa');
+  if (floatWa) {
+    if (id === 'orcamento') {
+      floatWa.style.display = 'none';
+    } else {
+      floatWa.style.display = 'flex';
+    }
+  }
+
   if (id === 'orcamento' && !chatStarted) startChat();
 }
 
