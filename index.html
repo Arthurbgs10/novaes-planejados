@@ -1331,6 +1331,26 @@ function showSummary() {
   setTimeout(() => {
     document.getElementById('summary-overlay').classList.remove('hidden');
   }, 1500);
+
+  // Envia os dados coletados automaticamente para o Google Sheets via Webhook
+function salvarNaPlanilha() {
+  const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxJr02nRWFJtZ1PuRN59IH8KGK8exI761oOrb-_0e184bA0vDEFGmNpaLK9b8dKOloJ/exec' ; // ← Cole sua URL entre as aspas
+
+  fetch(WEBHOOK_URL, {
+    method: 'POST',
+    mode: 'no-cors', // Evita bloqueio de CORS no navegador
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(userData)
+  })
+  .then(() => console.log('Dados salvos na planilha com sucesso!'))
+  .catch(err => console.error('Erro ao enviar para a planilha:', err));
+}
+
+  setTimeout(() => {
+    document.getElementById('summary-overlay').classList.remove('hidden');
+    salvarNaPlanilha(); // ← ADICIONE ESTA LINHA AQUI
+  }, 1500);
+  
 }
 
 function sendToWhatsApp() {
