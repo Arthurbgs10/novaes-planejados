@@ -5,15 +5,7 @@ import { INSTAGRAM_URL, LOCATION } from "@/lib/site-config";
 import type { PageId } from "./LandingApp";
 import type { DbPortfolioItem } from "./portfolio-data";
 
-type Category = "todos" | "cozinha" | "projeto3d";
-
-const FILTERS: { id: Category; label: string }[] = [
-  { id: "todos", label: "Todos" },
-  { id: "cozinha", label: "Cozinhas" },
-  { id: "projeto3d", label: "Projetos 3D" },
-];
-
-const PORTFOLIO_ITEMS: { src: string; alt: string; label: string; category: Exclude<Category, "todos"> }[] = [
+const PORTFOLIO_ITEMS: { src: string; alt: string; label: string; category: string | null }[] = [
   { src: "/images/image_6ed192.jpg", alt: "Cozinha Grafite", label: "Cozinha moderna — Grafite com painel ripado", category: "cozinha" },
   { src: "/images/image_6ed196.jpg", alt: "Cozinha com Bancada", label: "Integração de ambientes — Bancada em Granito Preto", category: "cozinha" },
   { src: "/images/image_6ed1b6.jpg", alt: "Cozinha LED", label: "Detalhe iluminação LED — Sofisticação e praticidade", category: "cozinha" },
@@ -23,11 +15,15 @@ const PORTFOLIO_ITEMS: { src: string; alt: string; label: string; category: Excl
 ];
 
 export default function PortfolioPage({ onNavigate, dbPortfolio }: { onNavigate: (page: PageId) => void; dbPortfolio: DbPortfolioItem[] }) {
-  const [filter, setFilter] = useState<Category>("todos");
+  const [filter, setFilter] = useState<string>("todos");
   // Enquanto não houver fotos reais publicadas no painel, a página mostra
   // as imagens de exemplo do protótipo original.
   const items: { src: string; alt: string; label: string; category: string | null }[] =
     dbPortfolio.length > 0 ? dbPortfolio : PORTFOLIO_ITEMS;
+  // Abas de filtro geradas a partir das categorias que existem de fato nos
+  // itens atuais — nunca ficam presas a "Cozinha"/"Projetos 3D" fixos no
+  // código; qualquer cômodo escolhido no painel já ganha sua aba aqui.
+  const categories = Array.from(new Set(items.map((i) => i.category).filter((c): c is string => !!c)));
   const visible = items.filter((item) => filter === "todos" || item.category === filter);
 
   return (
@@ -40,14 +36,12 @@ export default function PortfolioPage({ onNavigate, dbPortfolio }: { onNavigate:
         <p className="section-sub">Cada projeto é único. Clique para se inspirar e use isso na hora de solicitar seu orçamento.</p>
 
         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "2rem" }}>
-          {FILTERS.map((f) => (
-            <button
-              key={f.id}
-              type="button"
-              className={`opt-btn${filter === f.id ? " selected" : ""}`}
-              onClick={() => setFilter(f.id)}
-            >
-              {f.label}
+          <button type="button" className={`opt-btn${filter === "todos" ? " selected" : ""}`} onClick={() => setFilter("todos")}>
+            Todos
+          </button>
+          {categories.map((c) => (
+            <button key={c} type="button" className={`opt-btn${filter === c ? " selected" : ""}`} onClick={() => setFilter(c)}>
+              {c}
             </button>
           ))}
         </div>

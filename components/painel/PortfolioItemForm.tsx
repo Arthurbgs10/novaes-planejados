@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { X, Check } from "lucide-react";
 import type { PortfolioItemRecord } from "@/lib/types";
 import { portfolioImageUrl } from "@/lib/supabase/storage";
+import { PORTFOLIO_CATEGORY_OPTIONS } from "@/lib/validation";
 import { createPortfolioItemAction, updatePortfolioItemAction } from "@/app/painel/actions";
 
 export default function PortfolioItemForm({ initial, onCancel, onSaved }: {
@@ -58,6 +59,11 @@ export default function PortfolioItemForm({ initial, onCancel, onSaved }: {
         <div style={{ marginBottom: 14 }}>
           <label className="np-label" htmlFor="image">{initial?.image_path ? "Trocar foto (opcional)" : "Foto"}</label>
           <input id="image" name="image" type="file" accept="image/*" className="np-input" />
+          {initial?.image_path && (
+            <p style={{ fontSize: 11.5, color: "var(--np-fog)", marginTop: 6 }}>
+              Enviar uma foto aqui substitui a foto deste card. Pra adicionar um projeto novo, feche e use &quot;Novo projeto&quot;.
+            </p>
+          )}
         </div>
 
         <div style={{ marginBottom: 14 }}>
@@ -67,8 +73,11 @@ export default function PortfolioItemForm({ initial, onCancel, onSaved }: {
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 14 }}>
           <div>
-            <label className="np-label np-label-pair" htmlFor="category">Categoria</label>
-            <input id="category" name="category" className="np-input" value={category} onChange={(e) => setCategory(e.target.value)} placeholder="cozinha, quarto..." />
+            <label className="np-label np-label-pair" htmlFor="category">Cômodo / categoria</label>
+            <select id="category" name="category" className="np-input" value={category} onChange={(e) => setCategory(e.target.value)}>
+              <option value="">Geral (sem cômodo)</option>
+              {PORTFOLIO_CATEGORY_OPTIONS.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
           </div>
           <div>
             <label className="np-label np-label-pair" htmlFor="displayOrder">Ordem</label>

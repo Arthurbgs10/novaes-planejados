@@ -20,6 +20,12 @@ export const LEAD_STATUS_LABELS: Record<LeadStatus, string> = {
 
 export const ENVIRONMENT_OPTIONS = ["Cozinha", "Quarto", "Sala", "Banheiro", "Lavanderia", "Escritório"] as const;
 
+// Mesmo vocabulário de cômodo usado nos leads, + "Projeto 3D" (renders),
+// usado pra categorizar os cards do portfólio — tanto no painel (dropdown,
+// em vez de texto livre) quanto nos filtros da galeria pública, que são
+// gerados a partir do campo "category" de cada item.
+export const PORTFOLIO_CATEGORY_OPTIONS = [...ENVIRONMENT_OPTIONS, "Projeto 3D"] as const;
+
 export const VISIT_TYPE_VALUES = ["medicao", "instalacao", "outra"] as const;
 export type VisitType = (typeof VISIT_TYPE_VALUES)[number];
 export const VISIT_TYPE_LABELS: Record<VisitType, string> = {

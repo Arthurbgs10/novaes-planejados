@@ -37,6 +37,7 @@ export default function PortfolioView({ items, onItemsChange }: {
   }
 
   async function handleDelete(item: PortfolioItemRecord) {
+    if (!window.confirm(`Excluir "${item.title}"? A foto some do site na hora — isso não pode ser desfeito.`)) return;
     setBusyId(item.id);
     const result = await deletePortfolioItemAction(item.id);
     setBusyId(null);

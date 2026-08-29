@@ -126,7 +126,10 @@ export async function createVisitAction(input: unknown): Promise<ActionResult<Vi
     .insert({
       lead_id: parsed.data.leadId,
       type: parsed.data.type,
-      scheduled_at: new Date(parsed.data.scheduledAt).toISOString(),
+      // Já chega em ISO UTC (convertido no navegador — ver VisitForm.tsx):
+      // reconverter aqui rodaria no fuso do servidor (UTC na Vercel), não
+      // no fuso de quem preencheu o formulário.
+      scheduled_at: parsed.data.scheduledAt,
       status: parsed.data.status,
       notes: parsed.data.notes || null,
     })
@@ -155,7 +158,7 @@ export async function updateVisitAction(id: string, input: unknown): Promise<Act
     .update({
       lead_id: parsed.data.leadId,
       type: parsed.data.type,
-      scheduled_at: new Date(parsed.data.scheduledAt).toISOString(),
+      scheduled_at: parsed.data.scheduledAt,
       status: parsed.data.status,
       notes: parsed.data.notes || null,
     })
@@ -256,10 +259,19 @@ export async function updatePortfolioItemAction(
   if (!supabase) return { ok: false, error: "Sessão expirada. Faça login novamente." };
 
   let imagePath: string | undefined;
+  let previousImagePath: string | null = null;
   const file = formData.get("image");
   if (file instanceof File && file.size > 0) {
     if (!file.type.startsWith("image/")) return { ok: false, error: "O arquivo precisa ser uma imagem." };
     if (file.size > MAX_IMAGE_BYTES) return { ok: false, error: "Imagem muito grande (máx. 8MB)." };
+
+    const { data: existing } = await supabase
+      .from("portfolio_items")
+      .select("image_path")
+      .eq("id", id)
+      .single();
+    previousImagePath = existing?.image_path ?? null;
+
     imagePath = `${crypto.randomUUID()}.${fileExtension(file.name)}`;
     const { error: uploadError } = await supabase.storage
       .from("portfolio")
@@ -282,6 +294,13 @@ export async function updatePortfolioItemAction(
     .single();
 
   if (error || !data) return { ok: false, error: "Não foi possível salvar." };
+
+  // A foto antiga só é removida depois que a nova já está salva no registro
+  // — assim, se o update tivesse falhado, o card continuaria apontando pra
+  // uma imagem que ainda existe no bucket.
+  if (previousImagePath) {
+    await supabase.storage.from("portfolio").remove([previousImagePath]);
+  }
 
   revalidatePath("/painel");
   revalidatePath("/");

@@ -61,8 +61,17 @@ function OverviewView({ leads, visits, onEdit, onNew, onGoAgenda }: {
   );
   const nextVisitLead = nextVisit ? leads.find((l) => l.id === nextVisit.lead_id) : null;
 
+  // "Em carteira" = orçamentos ainda em andamento (nem perdidos, nem já
+  // instalados) — o que falta fechar/entregar. "Faturado" = o que já foi
+  // instalado, pra esse valor não simplesmente sumir da visão geral quando
+  // um lead muda de status (antes só existia o primeiro, e o valor de um
+  // projeto concluído parecia "zerar").
   const emCarteira = useMemo(
     () => leads.filter((l) => l.status !== "perdido" && l.status !== "instalado").reduce((sum, l) => sum + (l.budget_value || 0), 0),
+    [leads]
+  );
+  const faturado = useMemo(
+    () => leads.filter((l) => l.status === "instalado").reduce((sum, l) => sum + (l.budget_value || 0), 0),
     [leads]
   );
 
@@ -78,7 +87,8 @@ function OverviewView({ leads, visits, onEdit, onNew, onGoAgenda }: {
           value={nextVisit ? formatDateTimePt(nextVisit.scheduled_at) : "—"}
           sub={nextVisit ? nextVisitLead?.name || "Lead removido" : "Nada agendado"}
         />
-        <StatCard label="Em carteira" value={formatCurrency(emCarteira)} sub="orçamentos ativos" />
+        <StatCard label="Em carteira" value={formatCurrency(emCarteira)} sub="orçamentos em andamento" />
+        <StatCard label="Faturado" value={formatCurrency(faturado)} sub="projetos instalados" />
       </div>
 
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 14 }}>

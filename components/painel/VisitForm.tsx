@@ -58,7 +58,13 @@ export default function VisitForm({ initial, leads, prefillDate, onCancel, onSav
     if (!form.leadId) { setError("Selecione um lead."); return; }
     if (!form.scheduledAt) { setError("Escolha data e hora."); return; }
     setBusy("saving");
-    const result = isNew ? await createVisitAction(form) : await updateVisitAction(initial!.id, form);
+    // Converte pro UTC ainda aqui no navegador (que conhece o fuso horário
+    // real de quem está preenchendo). Se isso rodasse só na Server Action,
+    // ela executaria no servidor da Vercel (fuso UTC), interpretando
+    // "09:00" como 09:00 UTC em vez de 09:00 no Brasil — um erro de 3h.
+    const scheduledAtIso = new Date(form.scheduledAt).toISOString();
+    const payload = { ...form, scheduledAt: scheduledAtIso };
+    const result = isNew ? await createVisitAction(payload) : await updateVisitAction(initial!.id, payload);
     setBusy("idle");
     if (!result.ok) { setError(result.error); return; }
     onSaved(result.data);
